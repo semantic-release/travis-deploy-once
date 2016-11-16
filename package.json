@@ -1,0 +1,51 @@
+{
+  "name": "travis-deploy-once",
+  "version": "1.0.0",
+  "description": "run a deployment script only once in the test matrix",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && npm run build",
+    "build": "babel src.js > index.js",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/semantic-release/travis-deploy-once.git"
+  },
+  "keywords": [
+    "travis",
+    "deploy",
+    "after",
+    "success"
+  ],
+  "author": "Stephan Bönnemann <stephan@boennemann.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/semantic-release/travis-deploy-once/issues"
+  },
+  "homepage": "https://github.com/semantic-release/travis-deploy-once#readme",
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-plugin-transform-async-to-generator": "^6.16.0",
+    "babel-preset-es2015-node4": "^2.1.0",
+    "standard": "^8.5.0"
+  },
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "request": "^2.78.0",
+    "request-promise": "^4.1.1",
+    "travis-ci": "^2.1.1"
+  },
+  "babel": {
+    "presets": [
+      "es2015-node4"
+    ],
+    "plugins": [
+      "transform-async-to-generator"
+    ]
+  },
+  "files": [
+    "index.js",
+    "src.js"
+  ]
+}
