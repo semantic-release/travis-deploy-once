@@ -1,0 +1,17 @@
+language: node_js
+cache:
+  directories:
+    - node_modules
+notifications:
+  email: false
+node_js:
+  - '4'
+  - '6'
+  - '7'
+before_install:
+  - npm update -g npm
+before_script:
+  - npm prune
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/
