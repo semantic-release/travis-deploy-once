@@ -1,3 +1,4 @@
+require('babel-polyfill')
 const Promise = require('bluebird')
 const {promisify} = Promise
 const request = require('request-promise')
