@@ -6,7 +6,7 @@ const Travis = require('travis-ci')
 module.exports = async function travisDeployOnce ({token} = {}) {
   token = token || process.env.GH_TOKEN
   if (!token) throw new Error('GitHub token missing')
-  if (!process.env.TRAVIS === 'true') throw new Error('Not running on Travis')
+  if (process.env.TRAVIS !== 'true') throw new Error('Not running on Travis')
   if (!process.env.TRAVIS_JOB_NUMBER.endsWith('.1')) return null
   if (process.env.TRAVIS_TEST_RESULT === '1') return false
   if (process.env.TRAVIS_TEST_RESULT !== '0') throw new Error('Not running in Travis after_success hook')
