@@ -30,7 +30,7 @@
     "babel-plugin-transform-async-to-generator": "^6.16.0",
     "babel-preset-es2015-node4": "^2.1.0",
     "semantic-release": "^6.3.1",
-    "standard": "^8.5.0"
+    "standard": "^9.0.2"
   },
   "dependencies": {
     "bluebird": "^3.4.6",
