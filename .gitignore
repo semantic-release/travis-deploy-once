@@ -2,4 +2,6 @@
 node_modules
 *.log
 .DS_Store
-index.js
+
+.nyc_output
+coverage

@@ -5,9 +5,9 @@ cache:
 notifications:
   email: false
 node_js:
-  - '4'
-  - '6'
-  - '7'
+  - 8 # stable
+  - 6 # LTS
+  - 4 # maintainance
 before_script:
   - npm prune
 after_success:
