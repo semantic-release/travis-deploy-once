@@ -3,19 +3,18 @@ const {promisify} = require('util')
 const request = require('request-promise')
 const Travis = require('travis-ci')
 
-module.exports = async function travisDeployOnce ({token} = {}) {
-  token = token || process.env.GH_TOKEN
-  if (!token) throw new Error('GitHub token missing')
-  if (process.env.TRAVIS !== 'true') throw new Error('Not running on Travis')
-  if (!process.env.TRAVIS_JOB_NUMBER.endsWith('.1')) return null
-  if (process.env.TRAVIS_TEST_RESULT === '1') return false
-  if (process.env.TRAVIS_TEST_RESULT !== '0') throw new Error('Not running in Travis after_success hook')
+module.exports = async function travisDeployOnce (env = process.env) {
+  if (!env.GH_TOKEN) throw new Error('GitHub token missing')
+  if (env.TRAVIS !== 'true') throw new Error('Not running on Travis')
+  if (!env.TRAVIS_JOB_NUMBER.endsWith('.1')) return null
+  if (env.TRAVIS_TEST_RESULT === '1') return false
+  if (env.TRAVIS_TEST_RESULT !== '0') throw new Error('Not running in Travis after_success hook')
 
   const {private: pro} = await request({
     json: true,
-    url: `https://api.github.com/repos/${process.env.TRAVIS_REPO_SLUG}`,
+    url: `https://api.github.com/repos/${env.TRAVIS_REPO_SLUG}`,
     headers: {
-      Authorization: `token ${token}`,
+      Authorization: `token ${env.GH_TOKEN}`,
       'user-agent': 'travis-deploy-once'
     }
   })
@@ -29,14 +28,14 @@ module.exports = async function travisDeployOnce ({token} = {}) {
   })
 
   await promisify(travis.authenticate.bind(travis))({
-    github_token: token
+    github_token: env.GH_TOKEN
   })
 
-  const buildId = parseInt(process.env.TRAVIS_BUILD_ID, 10)
+  const buildId = parseInt(env.TRAVIS_BUILD_ID, 10)
   const buildApi = travis.builds(buildId)
   const {build: {job_ids: jobs}} = await promisify(buildApi.get.bind(buildApi))()
 
-  const currentJobId = parseInt(process.env.TRAVIS_JOB_ID, 10)
+  const currentJobId = parseInt(env.TRAVIS_JOB_ID, 10)
   for (let attempt = 1; attempt <= 100; attempt++) {
     let successes = 0
     for (let jobId of jobs) {
