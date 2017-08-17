@@ -1,6 +1,6 @@
 const {promisify} = require('util')
 
-const request = require('request-promise')
+const request = require('axios')
 const Travis = require('travis-ci')
 
 module.exports = async function travisDeployOnce (env = process.env) {
@@ -11,7 +11,6 @@ module.exports = async function travisDeployOnce (env = process.env) {
   if (env.TRAVIS_TEST_RESULT !== '0') throw new Error('Not running in Travis after_success hook')
 
   const {private: pro} = await request({
-    json: true,
     url: `https://api.github.com/repos/${env.TRAVIS_REPO_SLUG}`,
     headers: {
       Authorization: `token ${env.GH_TOKEN}`,

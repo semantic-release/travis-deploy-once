@@ -28,8 +28,7 @@
     "standard": "^8.5.0"
   },
   "dependencies": {
-    "request": "^2.78.0",
-    "request-promise": "^4.1.1",
+    "axios": "^0.16.2",
     "travis-ci": "^2.1.1"
   },
   "files": [
