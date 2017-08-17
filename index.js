@@ -5,7 +5,9 @@ const Travis = require('travis-ci')
 
 const electBuildLeader = require('./elect-build-leader')
 
-module.exports = async function travisDeployOnce (env = process.env) {
+module.exports = async function travisDeployOnce (input) {
+  const env = Object.assign({}, process.env, input)
+
   if (!env.GH_TOKEN) throw new Error('GitHub token missing')
   if (env.TRAVIS !== 'true') throw new Error('Not running on Travis')
   if (env.TRAVIS_TEST_RESULT !== '0') throw new Error('Not running in Travis after_success hook')
