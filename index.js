@@ -35,7 +35,8 @@ module.exports = async function travisDeployOnce (env = process.env) {
   const {build: {job_ids: jobs}} = await promisify(buildApi.get.bind(buildApi))()
 
   const currentJobId = parseInt(env.TRAVIS_JOB_ID, 10)
-  for (let attempt = 1; attempt <= 100; attempt++) {
+  let attempt = 0
+  while (++attempt) {
     let successes = 0
     for (let jobId of jobs) {
       if (jobId === currentJobId) {
@@ -73,6 +74,4 @@ module.exports = async function travisDeployOnce (env = process.env) {
 
     await new Promise(resolve => setTimeout(resolve, 3000))
   }
-
-  throw new Error('Timeout. Could not get accumulated results after 100 attempts.')
 }
