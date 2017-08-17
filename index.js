@@ -3,11 +3,11 @@ const {promisify} = require('util')
 const request = require('axios')
 const Travis = require('travis-ci')
 
+const electBuildLeader = require('./elect-build-leader')
+
 module.exports = async function travisDeployOnce (env = process.env) {
   if (!env.GH_TOKEN) throw new Error('GitHub token missing')
   if (env.TRAVIS !== 'true') throw new Error('Not running on Travis')
-  if (!env.TRAVIS_JOB_NUMBER.endsWith('.1')) return null
-  if (env.TRAVIS_TEST_RESULT === '1') return false
   if (env.TRAVIS_TEST_RESULT !== '0') throw new Error('Not running in Travis after_success hook')
 
   const {private: pro} = await request({
@@ -32,7 +32,14 @@ module.exports = async function travisDeployOnce (env = process.env) {
 
   const buildId = parseInt(env.TRAVIS_BUILD_ID, 10)
   const buildApi = travis.builds(buildId)
-  const {build: {job_ids: jobs}} = await promisify(buildApi.get.bind(buildApi))()
+  const {build: {config, job_ids: jobs}} = await promisify(buildApi.get.bind(buildApi))()
+
+  const buildLeader = env.BUILD_LEADER_ID || (config.node_js
+    ? electBuildLeader(config.node_js)
+    : 1)
+
+  if (!env.TRAVIS_JOB_NUMBER.endsWith(`.${buildLeader}`)) return null
+  if (env.TRAVIS_TEST_RESULT === '1') return false
 
   const currentJobId = parseInt(env.TRAVIS_JOB_ID, 10)
   let attempt = 0
