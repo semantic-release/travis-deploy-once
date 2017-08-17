@@ -35,5 +35,8 @@
   },
   "files": [
     "index.js"
-  ]
+  ],
+  "engines": {
+    "node": ">=8"
+  }
 }
