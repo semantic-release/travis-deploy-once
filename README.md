@@ -1,5 +1,7 @@
 # travis-deploy-once
 
+[![Build Status](https://travis-ci.org/semantic-release/travis-deploy-once.svg?branch=master)](https://travis-ci.org/semantic-release/travis-deploy-once)
+
 You want to test as many node versions as possible and deploy if all of them pass.
 This module allows you do just that in a script running in Travis' after_success hook.
 
