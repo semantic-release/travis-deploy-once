@@ -32,7 +32,17 @@ module.exports = async function travisDeployOnce (env = process.env) {
 
   const buildId = parseInt(env.TRAVIS_BUILD_ID, 10)
   const buildApi = travis.builds(buildId)
-  const {build: {config, job_ids: jobs}} = await promisify(buildApi.get.bind(buildApi))()
+  try {
+    var {build: {config, job_ids: jobs}} = await promisify(buildApi.get.bind(buildApi))()
+  } catch (err) {
+    // https://github.com/semantic-release/travis-deploy-once/issues/3
+    // https://github.com/pwmckenna/node-travis-ci/issues/17
+    if (err.file === 'not found') {
+      throw new Error(`The GitHub user of the "GH_TOKEN" has not authenticated Travis CI yet.
+Go to https://travis-ci.com/ and login with the GitHub user of this token.`)
+    }
+    throw err
+  }
 
   const buildLeader = env.BUILD_LEADER_ID || (config.node_js
     ? electBuildLeader(config.node_js)
