@@ -40,6 +40,7 @@ module.exports = async function travisDeployOnce (env = process.env) {
 
   if (!env.TRAVIS_JOB_NUMBER.endsWith(`.${buildLeader}`)) return null
   if (env.TRAVIS_TEST_RESULT === '1') return false
+  if (jobs.length === 1) return true
 
   const currentJobId = parseInt(env.TRAVIS_JOB_ID, 10)
   let attempt = 0
