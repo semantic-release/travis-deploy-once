@@ -2,7 +2,7 @@
   "name": "travis-deploy-once",
   "version": "0.0.0-development",
   "description": "run a deployment script only once in the test matrix",
-  "main": "index.js",
+  "main": "node-8-guard.js",
   "scripts": {
     "test": "standard",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "semver": "^5.4.1",
     "travis-ci": "^2.1.1"
   },
   "files": [
