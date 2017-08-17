@@ -1,5 +1,5 @@
-const Promise = require('bluebird')
-const {promisify} = Promise
+const {promisify} = require('util')
+
 const request = require('request-promise')
 const Travis = require('travis-ci')
 
@@ -28,13 +28,13 @@ module.exports = async function travisDeployOnce ({token} = {}) {
     }
   })
 
-  await promisify(travis.authenticate, {context: travis})({
+  await promisify(travis.authenticate.bind(travis))({
     github_token: token
   })
 
   const buildId = parseInt(process.env.TRAVIS_BUILD_ID, 10)
   const buildApi = travis.builds(buildId)
-  const {build: {job_ids: jobs}} = await promisify(buildApi.get, {context: buildApi})()
+  const {build: {job_ids: jobs}} = await promisify(buildApi.get.bind(buildApi))()
 
   const currentJobId = parseInt(process.env.TRAVIS_JOB_ID, 10)
   for (let attempt = 1; attempt <= 100; attempt++) {
@@ -46,7 +46,7 @@ module.exports = async function travisDeployOnce ({token} = {}) {
       }
 
       const jobApi = travis.jobs(jobId)
-      const {job} = await promisify(jobApi.get, {context: jobApi})()
+      const {job} = await promisify(jobApi.get.bind(jobApi))()
 
       if (job.allow_failure) {
         successes++
@@ -73,7 +73,7 @@ module.exports = async function travisDeployOnce ({token} = {}) {
       return true
     }
 
-    await Promise.delay(3000)
+    await new Promise(resolve => setTimeout(resolve, 3000))
   }
 
   throw new Error('Timeout. Could not get accumulated results after 100 attempts.')
