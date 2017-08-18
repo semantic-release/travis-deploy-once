@@ -15,6 +15,7 @@ npm install --save travis-deploy-once
 const deployOnce = require('travis-deploy-once')
 
 try {
+  // Options can also be set as environment variables with the same name
   var result = await deployOnce({
     // GitHub oAuth token
     GH_TOKEN: 'asd',

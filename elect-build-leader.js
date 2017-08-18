@@ -5,6 +5,7 @@ module.exports = versions => {
   if (!Array.isArray(versions) || versions.length === 1) return 1
 
   // if there is latest stable it's the winner
+  // https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions
   const stable = versions.indexOf('node') + 1
   if (stable) return stable
 
