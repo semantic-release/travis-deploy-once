@@ -41,7 +41,7 @@ module.exports = async function travisDeployOnce (input) {
     // https://github.com/pwmckenna/node-travis-ci/issues/17
     if (err.file === 'not found') {
       throw new Error(`The GitHub user of the "GH_TOKEN" has not authenticated Travis CI yet.
-Go to https://travis-ci.com/ and login with the GitHub user of this token.`)
+Go to https://travis-ci.com/, login with the GitHub user of this token and then restart this job.`)
     }
     throw err
   }
