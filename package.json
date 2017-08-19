@@ -21,7 +21,9 @@
     "node": ">=8"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "node-8-guard.js",
+    "elect-build-leader.js"
   ],
   "homepage": "https://github.com/semantic-release/travis-deploy-once#readme",
   "keywords": [
