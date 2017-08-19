@@ -35,7 +35,7 @@ module.exports = async function travisDeployOnce (input) {
   const buildId = parseInt(env.TRAVIS_BUILD_ID, 10)
   const buildApi = travis.builds(buildId)
   try {
-    var {build: {config, job_ids: jobs}} = await promisify(buildApi.get.bind(buildApi))()
+    var {jobs} = await promisify(buildApi.get.bind(buildApi))()
   } catch (err) {
     // https://github.com/semantic-release/travis-deploy-once/issues/3
     // https://github.com/pwmckenna/node-travis-ci/issues/17
@@ -46,9 +46,9 @@ Go to https://travis-ci.com/, login with the GitHub user of this token and then 
     throw err
   }
 
-  const buildLeader = env.BUILD_LEADER_ID || (config.node_js
-    ? electBuildLeader(config.node_js)
-    : 1)
+  const buildLeader = env.BUILD_LEADER_ID || electBuildLeader(
+    jobs.map(job => job.config.node_js)
+  )
 
   if (!env.TRAVIS_JOB_NUMBER.endsWith(`.${buildLeader}`)) return null
   if (env.TRAVIS_TEST_RESULT === '1') return false
@@ -58,13 +58,13 @@ Go to https://travis-ci.com/, login with the GitHub user of this token and then 
   let attempt = 0
   while (++attempt) {
     let successes = 0
-    for (let jobId of jobs) {
-      if (jobId === currentJobId) {
+    for (let {id} of jobs) {
+      if (id === currentJobId) {
         successes++
         continue
       }
 
-      const jobApi = travis.jobs(jobId)
+      const jobApi = travis.jobs(id)
       const {job} = await promisify(jobApi.get.bind(jobApi))()
 
       if (job.allow_failure) {
