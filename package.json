@@ -14,7 +14,7 @@
   "devDependencies": {
     "ava": "^0.22.0",
     "greenkeeper-lockfile": "^1.8.1",
-    "semantic-release": "^7.0.1",
+    "semantic-release": "^8.0.0",
     "standard": "^10.0.3"
   },
   "engines": {
