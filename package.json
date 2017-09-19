@@ -19,15 +19,35 @@
   "devDependencies": {
     "ava": "^0.22.0",
     "codecov": "^2.3.0",
-    "standard": "^10.0.3",
     "commitizen": "^2.9.6",
     "cz-conventional-changelog": "^2.0.0",
+    "eslint": "^4.7.0",
+    "eslint-config-prettier": "^2.5.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-prettier": "^2.3.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
     "nyc": "^11.2.1",
+    "prettier": "^1.7.0",
     "rimraf": "^2.6.2",
     "semantic-release": "^8.0.0"
   },
   "engines": {
     "node": ">=8"
+  },
+  "eslintConfig": {
+    "extends": [
+      "standard",
+      "prettier"
+    ],
+    "plugins": [
+      "prettier"
+    ],
+    "rules": {
+      "prettier/prettier": 2
+    }
   },
   "files": [
     "index.js",
@@ -59,16 +79,22 @@
     ],
     "all": true
   },
+  "prettier": {
+    "printWidth": 120,
+    "singleQuote": true,
+    "bracketSpacing": false,
+    "trailingComma": "es5"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/semantic-release/travis-deploy-once.git"
   },
   "scripts": {
-    "pretest": "standard",
-    "codecov": "codecov",
     "clean": "rimraf coverage && rimraf .nyc_output",
     "cm": "git-cz",
+    "codecov": "codecov",
     "coverage": "nyc check-coverage",
+    "lint": "eslint .",
     "pretest": "npm run clean && npm run lint",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "test": "nyc ava -v"
