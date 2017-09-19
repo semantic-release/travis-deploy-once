@@ -8,7 +8,10 @@ notifications:
 node_js: 8
 before_script: npx -p greenkeeper-lockfile@1 greenkeeper-lockfile-update
 after_script: npx -p greenkeeper-lockfile@1 greenkeeper-lockfile-upload
-after_success: npm run semantic-release
+after_success:
+  - npm run codecov
+  - npm run coverage
+  - npm run semantic-release
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/
