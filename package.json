@@ -6,6 +6,11 @@
   "bugs": {
     "url": "https://github.com/semantic-release/travis-deploy-once/issues"
   },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
   "dependencies": {
     "axios": "^0.16.2",
     "semver": "^5.4.1",
@@ -16,6 +21,8 @@
     "greenkeeper-lockfile": "^1.8.1",
     "semantic-release": "^8.0.0",
     "standard": "^10.0.3"
+    "commitizen": "^2.9.6",
+    "cz-conventional-changelog": "^2.0.0",
   },
   "engines": {
     "node": ">=8"
@@ -40,6 +47,7 @@
   },
   "scripts": {
     "pretest": "standard",
+    "cm": "git-cz",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "test": "ava"
   }
