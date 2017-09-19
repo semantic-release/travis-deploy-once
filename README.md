@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/semantic-release/travis-deploy-once.svg?branch=master)](https://travis-ci.org/semantic-release/travis-deploy-once)
 [![license](https://img.shields.io/github/license/semantic-release/travis-deploy-once.svg)](https://github.com/semantic-release/travis-deploy-once/blob/master/LICENSE)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 You want to test as many node versions as possible and deploy if all of them pass.
 This module allows you do just that in a script running in Travis' after_success hook.
