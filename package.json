@@ -19,7 +19,6 @@
   "devDependencies": {
     "ava": "^0.22.0",
     "codecov": "^2.3.0",
-    "greenkeeper-lockfile": "^1.8.1",
     "standard": "^10.0.3",
     "commitizen": "^2.9.6",
     "cz-conventional-changelog": "^2.0.0",
