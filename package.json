@@ -18,11 +18,14 @@
   },
   "devDependencies": {
     "ava": "^0.22.0",
+    "codecov": "^2.3.0",
     "greenkeeper-lockfile": "^1.8.1",
-    "semantic-release": "^8.0.0",
-    "standard": "^10.0.3"
+    "standard": "^10.0.3",
     "commitizen": "^2.9.6",
     "cz-conventional-changelog": "^2.0.0",
+    "nyc": "^11.2.1",
+    "rimraf": "^2.6.2",
+    "semantic-release": "^8.0.0"
   },
   "engines": {
     "node": ">=8"
@@ -41,14 +44,34 @@
   ],
   "license": "MIT",
   "main": "node-8-guard.js",
+  "nyc": {
+    "lines": 16,
+    "statements": 17,
+    "functions": 33,
+    "branches": 15,
+    "include": [
+      "index.js",
+      "node-8-guard.js",
+      "elect-build-leader.js"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "all": true
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/semantic-release/travis-deploy-once.git"
   },
   "scripts": {
     "pretest": "standard",
+    "codecov": "codecov",
+    "clean": "rimraf coverage && rimraf .nyc_output",
     "cm": "git-cz",
+    "coverage": "nyc check-coverage",
+    "pretest": "npm run clean && npm run lint",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "test": "ava"
+    "test": "nyc ava -v"
   }
 }
