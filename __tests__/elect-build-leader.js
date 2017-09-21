@@ -5,6 +5,8 @@ const electBuildLeader = require('../elect-build-leader')
 test('find highest node version in build matrix', t => {
   t.is(electBuildLeader('1'), 1, 'no matrix')
 
+  t.is(electBuildLeader([3, '2', 1]), 1, 'version as integers')
+
   t.is(electBuildLeader([
     '8',
     '4',

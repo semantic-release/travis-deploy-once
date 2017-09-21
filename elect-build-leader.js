@@ -9,6 +9,8 @@ module.exports = versions => {
   const stable = versions.indexOf('node') + 1
   if (stable) return stable
 
+  // Convert to Strings as expected by semver
+  versions = versions.map(version => String(version))
   // otherwise we use the lower bound of all valid semver ranges
   const validRanges = versions.filter(semver.validRange)
   const lowVersionBoundaries = validRanges
