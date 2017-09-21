@@ -10,7 +10,7 @@ module.exports = async function travisDeployOnce(input) {
   if (env.TRAVIS !== 'true') throw new Error('Not running on Travis');
   if (env.TRAVIS_TEST_RESULT !== '0') throw new Error('Not running in Travis after_success hook');
 
-  const {private: pro} = await request({
+  const {data: {private: pro}} = await request({
     url: `https://api.github.com/repos/${env.TRAVIS_REPO_SLUG}`,
     headers: {Authorization: `token ${env.GH_TOKEN}`, 'user-agent': 'travis-deploy-once'},
   });
