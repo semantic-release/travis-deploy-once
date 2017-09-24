@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "chalk": "^2.1.0",
+    "p-retry": "^1.0.0",
     "semver": "^5.4.1",
     "travis-ci": "^2.1.1"
   },
@@ -29,10 +31,13 @@
     "eslint-plugin-prettier": "^2.3.0",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "nock": "^9.0.18",
     "nyc": "^11.2.1",
     "prettier": "^1.7.0",
+    "proxyquire": "^1.8.0",
     "rimraf": "^2.6.2",
-    "semantic-release": "^8.0.0"
+    "semantic-release": "^8.0.0",
+    "sinon": "^3.3.0"
   },
   "engines": {
     "node": ">=4"
@@ -51,8 +56,7 @@
   },
   "files": [
     "index.js",
-    "node-8-guard.js",
-    "elect-build-leader.js"
+    "lib"
   ],
   "homepage": "https://github.com/semantic-release/travis-deploy-once#readme",
   "keywords": [
@@ -62,16 +66,14 @@
     "travis"
   ],
   "license": "MIT",
-  "main": "node-8-guard.js",
+  "main": "index.js",
   "nyc": {
-    "lines": 16,
-    "statements": 17,
-    "functions": 33,
-    "branches": 15,
+    "lines": 100,
+    "statements": 100,
+    "functions": 100,
+    "branches": 100,
     "include": [
-      "index.js",
-      "node-8-guard.js",
-      "elect-build-leader.js"
+      "lib/**/*.js"
     ],
     "reporter": [
       "lcov",
