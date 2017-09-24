@@ -1,6 +1,6 @@
 # travis-deploy-once
 
-[![npm](https://img.shields.io/npm/v/@semantic-release/travis-deploy-once.svg)](https://www.npmjs.com/package/@semantic-release/travis-deploy-once)
+[![npm](https://img.shields.io/npm/v/travis-deploy-once.svg)](https://www.npmjs.com/package/travis-deploy-once)
 [![Greenkeeper badge](https://badges.greenkeeper.io/semantic-release/travis-deploy-once.svg)](https://greenkeeper.io/)
 [![license](https://img.shields.io/github/license/semantic-release/travis-deploy-once.svg)](https://github.com/semantic-release/travis-deploy-once/blob/master/LICENSE)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
