@@ -1,7 +1,7 @@
 import test from 'ava';
 import nock from 'nock';
 import getClient from '../lib/get-client';
-import {authenticate, unauthorized} from './helpers/mock-api';
+import {authenticate, unauthorized} from './helpers/mock-travis';
 
 test.beforeEach(t => {
   t.context.env = process.env;
@@ -15,29 +15,26 @@ test.afterEach.always(t => {
 });
 
 test.serial('Authenticate with Travis', async t => {
-  const {github, travis} = authenticate(process.env.GH_TOKEN, process.env.TRAVIS_REPO_SLUG);
-  const client = await getClient(process.env);
+  const travis = authenticate();
+  const client = await getClient({pro: false}, process.env);
 
   t.truthy(client);
   t.false(client.pro);
-  t.true(github.isDone());
   t.true(travis.isDone());
 });
 
 test.serial('Authenticate with Travis Pro', async t => {
-  const {github, travis} = authenticate(process.env.GH_TOKEN, process.env.TRAVIS_REPO_SLUG, true);
-  const client = await getClient(process.env);
+  const travis = authenticate({pro: true});
+  const client = await getClient({pro: true}, process.env);
 
   t.truthy(client);
   t.true(client.pro);
-  t.true(github.isDone());
   t.true(travis.isDone());
 });
 
 test.serial('Throws and Error if GH_TOKEN is un-authorized on Travis', async t => {
-  const {github, travis} = unauthorized(process.env.GH_TOKEN, process.env.TRAVIS_REPO_SLUG);
-  await t.throws(getClient(process.env));
+  const travis = unauthorized();
+  await t.throws(getClient({pro: false}, process.env));
 
-  t.true(github.isDone());
   t.true(travis.isDone());
 });

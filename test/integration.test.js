@@ -3,7 +3,7 @@ import nock from 'nock';
 import proxyquire from 'proxyquire';
 import getLogger from '../lib/get-logger';
 import {stub} from 'sinon';
-import {authenticate} from './helpers/mock-api';
+import {authenticate} from './helpers/mock-travis';
 
 test.beforeEach(t => {
   t.context.env = process.env;
@@ -32,7 +32,7 @@ test.serial('Return true if there is only one job', async t => {
   process.env.TRAVIS_JOB_ID = 456;
   process.env.TRAVIS_JOB_NUMBER = '1.1';
   const jobs = [{id: process.env.TRAVIS_JOB_ID, number: '1.1', state: 'started', config: {node_js: 8}}];
-  const {travis} = authenticate();
+  const travis = authenticate();
 
   travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs: jobs});
 
@@ -54,7 +54,7 @@ test.serial('Return true if the current job is the build leader and all other jo
     {id: jobId, number: '1.1', state: 'started', config: {node_js: 8}},
     {id: 789, number: '1.2', state: 'passed', config: {node_js: 6}},
   ];
-  const {travis} = authenticate();
+  const travis = authenticate();
 
   travis
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
@@ -84,7 +84,7 @@ test.serial('Works with jobs that are not running on node', async t => {
     {id: jobId, number: '1.2', state: 'started', config: {node_js: 8}},
     {id: 789, number: '1.3', state: 'passed', config: {node_js: 6}},
   ];
-  const {travis} = authenticate();
+  const travis = authenticate();
 
   travis
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
@@ -111,7 +111,7 @@ test.serial('Return false if the current job is the build leader and another job
     {id: jobId, number: '1.1', state: 'started', config: {node_js: 8}},
     {id: 789, number: '1.2', state: 'errored', config: {node_js: 6}},
   ];
-  const {travis} = authenticate();
+  const travis = authenticate();
 
   travis
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
@@ -141,7 +141,7 @@ test.serial('Return null if the current job is not the build leader', async t =>
     {id: jobId, number: '1.1', state: 'started', config: {node_js: 6}},
     {id: 789, number: '1.2', state: 'started', config: {node_js: 8}},
   ];
-  const {travis} = authenticate();
+  const travis = authenticate();
 
   travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs: jobsFirst});
 
@@ -166,7 +166,7 @@ test.serial(
       {id: jobId, number: '1.1', state: 'started', config: {node_js: 6}},
       {id: 789, number: '1.2', state: 'passed', config: {node_js: 8}},
     ];
-    const {travis} = authenticate();
+    const travis = authenticate();
 
     travis
       .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
@@ -191,7 +191,7 @@ test.serial('Allow to pass BUILD_LEADER_ID as parameter', async t => {
     {id: 789, number: '1.2', state: 'passed', config: {node_js: 8}},
   ];
 
-  const {travis} = authenticate();
+  const travis = authenticate();
 
   travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs: jobsFirst});
 
@@ -211,7 +211,7 @@ test.serial('Allow to pass GH_TOKEN as parameter', async t => {
     {id: jobId, number: '1.1', state: 'started', config: {node_js: 8}},
     {id: 789, number: '1.2', state: 'passed', config: {node_js: 6}},
   ];
-  const {travis} = authenticate(GH_TOKEN);
+  const travis = authenticate({GH_TOKEN});
 
   travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs: jobsFirst});
 
@@ -230,7 +230,7 @@ test.serial('Choose first occurence of the highest version as leader', async t =
     {id: 789, number: '1.1', state: 'started', config: {node_js: 8}},
     {id: jobId, number: '1.2', state: 'started', config: {node_js: 8}},
   ];
-  const {travis} = authenticate();
+  const travis = authenticate();
 
   travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs: jobsFirst});
 

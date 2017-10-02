@@ -1,7 +1,7 @@
 import test from 'ava';
 import nock from 'nock';
 import getJobs from '../lib/get-jobs';
-import {authenticate} from './helpers/mock-api';
+import {authenticate} from './helpers/mock-travis';
 import getClient from '../lib/get-client';
 
 test.beforeEach(t => {
@@ -19,8 +19,8 @@ test.serial('Return job list', async t => {
   const buildId = 123;
   const jobsFirst = [{id: 456, state: 'started'}, {id: 789, state: 'started'}];
   const jobsSecond = [{id: 456, state: 'passed'}, {id: 789, state: 'passed'}];
-  const {travis} = authenticate();
-  const client = await getClient(process.env);
+  const travis = authenticate();
+  const client = await getClient({}, process.env);
 
   travis
     .get(`/builds/${buildId}`)
@@ -35,8 +35,8 @@ test.serial('Return job list', async t => {
 
 test.serial('Throws error if GH_TOKEN is not authenticated with Travis', async t => {
   const buildId = 123;
-  const {travis} = authenticate();
-  const client = await getClient(process.env);
+  const travis = authenticate();
+  const client = await getClient({}, process.env);
 
   travis.get(`/builds/${buildId}`).reply(404, {file: 'not found'});
 
@@ -46,8 +46,8 @@ test.serial('Throws error if GH_TOKEN is not authenticated with Travis', async t
 
 test.serial('Throws an error if server returns and error', async t => {
   const buildId = 123;
-  const {travis} = authenticate();
-  const client = await getClient(process.env);
+  const travis = authenticate();
+  const client = await getClient({}, process.env);
 
   travis.get(`/builds/${buildId}`).reply(401);
 

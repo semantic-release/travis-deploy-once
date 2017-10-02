@@ -24,13 +24,17 @@ const deployOnce = require('travis-deploy-once')
 
 try {
   // Options can also be set as environment variables with the same name
-  var result = await deployOnce({
-    // GitHub oAuth token
-    GH_TOKEN: 'asd',
-    // Want to control which job is the build leader?
-    // Set your preferred job id
-    BUILD_LEADER_ID: 1  
-  })
+  const result = await deployOnce(
+    {
+      // Object passed to https://github.com/pwmckenna/node-travis-ci
+      travisOpts: {pro: true},
+      // GitHub oAuth token
+      GH_TOKEN: 'asd',
+      // Want to control which job is the build leader?
+      // Set your preferred job id
+      BUILD_LEADER_ID: 1,
+    }
+  );
 } catch (err) {
   // something went wrong, and err will tell you what
 }
