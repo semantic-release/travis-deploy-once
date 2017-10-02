@@ -1,7 +1,7 @@
 import test from 'ava';
 import nock from 'nock';
 import {stub} from 'sinon';
-import {authenticate} from './helpers/mock-api';
+import {authenticate} from './helpers/mock-travis';
 import getLogger from '../lib/get-logger';
 import getClient from '../lib/get-client';
 import waitForOtherJobs from '../lib/wait-for-other-jobs';
@@ -38,8 +38,8 @@ test.serial('Wait for jobs to complete, ignoring current one and return true', a
     {id: currentJobId, number: '1.2', state: 'started'},
     {id: 3, number: '1.3', state: 'passed'},
   ];
-  const {travis} = authenticate();
-  const client = await getClient(process.env);
+  const travis = authenticate();
+  const client = await getClient({}, process.env);
 
   travis
     .get(`/builds/${buildId}`)
@@ -80,8 +80,8 @@ test.serial('Return false as soon as a job fails', async t => {
     {id: currentJobId, number: '1.2', state: 'started'},
     {id: 3, number: '1.3', state: 'errored'},
   ];
-  const {travis} = authenticate();
-  const client = await getClient(process.env);
+  const travis = authenticate();
+  const client = await getClient({}, process.env);
 
   travis
     .get(`/builds/${buildId}`)
@@ -118,8 +118,8 @@ test.serial('Handle API errors', async t => {
     {id: currentJobId, number: '1.2', state: 'started'},
     {id: 3, number: '1.3', state: 'passed'},
   ];
-  const {travis} = authenticate();
-  const client = await getClient(process.env);
+  const travis = authenticate();
+  const client = await getClient({}, process.env);
 
   travis
     .get(`/builds/${buildId}`)

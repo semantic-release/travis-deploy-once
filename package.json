@@ -12,7 +12,6 @@
     }
   },
   "dependencies": {
-    "axios": "^0.16.2",
     "chalk": "^2.1.0",
     "p-retry": "^1.0.0",
     "semver": "^5.4.1",
