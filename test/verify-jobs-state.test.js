@@ -2,6 +2,8 @@ import test from 'ava';
 import {AbortError} from 'p-retry';
 import verifyJobsState from '../lib/verify-jobs-state';
 
+/* eslint camelcase: ["error", {properties: "never"}] */
+
 test('Return empty array if each job is either passed or allow failure', t => {
   const jobs = [
     {number: '1.1', state: 'passed'},

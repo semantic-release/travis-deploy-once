@@ -1,10 +1,10 @@
 import test from 'ava';
 import nock from 'nock';
 import {stub} from 'sinon';
-import {authenticate} from './helpers/mock-travis';
 import getLogger from '../lib/get-logger';
 import getClient from '../lib/get-client';
 import waitForOtherJobs from '../lib/wait-for-other-jobs';
+import {authenticate} from './helpers/mock-travis';
 
 test.beforeEach(t => {
   t.context.env = process.env;

@@ -1,8 +1,8 @@
 import test from 'ava';
 import nock from 'nock';
 import getJobs from '../lib/get-jobs';
-import {authenticate} from './helpers/mock-travis';
 import getClient from '../lib/get-client';
+import {authenticate} from './helpers/mock-travis';
 
 test.beforeEach(t => {
   t.context.env = process.env;
