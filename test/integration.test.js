@@ -1,9 +1,11 @@
 import test from 'ava';
 import nock from 'nock';
 import proxyquire from 'proxyquire';
-import getLogger from '../lib/get-logger';
 import {stub} from 'sinon';
+import getLogger from '../lib/get-logger';
 import {authenticate} from './helpers/mock-travis';
+
+/* eslint camelcase: ["error", {properties: "never"}] */
 
 test.beforeEach(t => {
   t.context.env = process.env;
@@ -34,7 +36,7 @@ test.serial('Return true if there is only one job', async t => {
   const jobs = [{id: process.env.TRAVIS_JOB_ID, number: '1.1', state: 'started', config: {node_js: 8}}];
   const travis = authenticate();
 
-  travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs: jobs});
+  travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs});
 
   t.true(await t.context.travisDeployOnce());
   t.true(travis.isDone());
