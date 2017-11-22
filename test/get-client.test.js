@@ -23,6 +23,15 @@ test.serial('Authenticate with Travis', async t => {
   t.true(travis.isDone());
 });
 
+test.serial('Authenticate with Travis (non Pro by default)', async t => {
+  const travis = authenticate();
+  const client = await getClient(undefined, process.env);
+
+  t.truthy(client);
+  t.false(client.pro);
+  t.true(travis.isDone());
+});
+
 test.serial('Authenticate with Travis Pro', async t => {
   const travis = authenticate({pro: true});
   const client = await getClient({pro: true}, process.env);
