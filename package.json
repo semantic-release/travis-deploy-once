@@ -12,10 +12,10 @@
     }
   },
   "dependencies": {
+    "@simenb/travis-ci": "^2.3.1",
     "chalk": "^2.1.0",
     "p-retry": "^1.0.0",
-    "semver": "^5.4.1",
-    "travis-ci": "^2.1.1"
+    "semver": "^5.4.1"
   },
   "devDependencies": {
     "ava": "^0.24.0",
