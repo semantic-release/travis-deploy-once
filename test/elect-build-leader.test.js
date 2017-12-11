@@ -32,8 +32,14 @@ test('Find highest node version with version range', t => {
   t.is(t.context.log.args[1][0], 'Elect job 9 as build leader as it runs the highest node version (>8.4).');
 });
 
-test('Select the first occurence of the highest version', t => {
-  t.is(electBuildLeader(['8.0.0', '8'], t.context.logger), 1);
-  t.is(t.context.log.callCount, 2);
-  t.is(t.context.log.args[1][0], 'Elect job 1 as build leader as it runs the highest node version (8.0.0).');
+test('Select the last occurence of the highest version', t => {
+  t.is(electBuildLeader([7, '8.0.0', 8, '8.x.x', '8.0.0', 7], t.context.logger), 5);
+  t.true(t.context.log.calledTwice);
+  t.is(t.context.log.args[1][0], 'Elect job 5 as build leader as it runs the highest node version (8.0.0).');
+});
+
+test('Select the last occurence of the "latest stable"', t => {
+  t.is(electBuildLeader(['node', '8', '9', 'node', 'node'], t.context.logger), 5);
+  t.true(t.context.log.calledTwice);
+  t.is(t.context.log.args[1][0], 'Elect job 5 as build leader as it runs on the latest node stable version.');
 });
