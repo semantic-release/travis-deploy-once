@@ -81,3 +81,5 @@ Default: `false`
 Type: `String`
 
 [Travis Enterprise](https://enterprise.travis-ci.com) URL. If defined, the [pro](#pro) option will be ignored.
+
+**Note**: This is the URL of the API endpoint, for example `https://travis.example.com/api`.
