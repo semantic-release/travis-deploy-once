@@ -7,8 +7,10 @@ import {authenticate, api} from './helpers/mock-travis';
 
 /* eslint camelcase: ["error", {properties: "never"}] */
 
+let env;
+
 test.beforeEach(t => {
-  t.context.env = process.env;
+  env = Object.assign({}, process.env);
   process.env.TRAVIS = 'true';
   process.env.TRAVIS_REPO_SLUG = 'test_user/test_repo';
   process.env.GH_TOKEN = 'GITHUB_TOKEN';
@@ -24,8 +26,8 @@ test.beforeEach(t => {
   });
 });
 
-test.afterEach.always(t => {
-  process.env = t.context.env;
+test.afterEach.always(() => {
+  process.env = env;
   nock.cleanAll();
 });
 
@@ -249,3 +251,59 @@ test.serial('Choose first occurence of the highest version as leader', async t =
   t.true(travis.isDone());
   t.is(t.context.log.lastCall.args[0], 'The current job (1.2) is not the build leader.');
 });
+
+test.serial('Return null if none of the job define a Node version', async t => {
+  const jobId = 456;
+  process.env.TRAVIS_BUILD_ID = 123;
+  process.env.TRAVIS_JOB_ID = jobId;
+  process.env.TRAVIS_JOB_NUMBER = '1.2';
+  const jobsFirst = [
+    {id: 111, number: '1.1', state: 'started', config: {java: 8}},
+    {id: jobId, number: '1.2', state: 'started', config: {java: 7}},
+    {id: 789, number: '1.3', state: 'passed', config: {java: 6}},
+  ];
+  const auth = authenticate();
+  const travis = api()
+    .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
+    .reply(200, {jobs: jobsFirst});
+
+  t.is(await t.context.travisDeployOnce(), null);
+  t.true(auth.isDone());
+  t.true(travis.isDone());
+  t.true(
+    t.context.log.calledWith(
+      'There is no job in this build defining a node version, please set BUILD_LEADER_ID to define the build leader yourself.'
+    )
+  );
+});
+
+test.serial(
+  'Return true if the current job is BUILD_LEADER_ID even if none of the job define a Node version',
+  async t => {
+    const jobId = 456;
+    process.env.BUILD_LEADER_ID = 2;
+    process.env.TRAVIS_BUILD_ID = 123;
+    process.env.TRAVIS_JOB_ID = jobId;
+    process.env.TRAVIS_JOB_NUMBER = '1.2';
+    const jobsFirst = [
+      {id: jobId, number: '1.1', state: 'started', config: {java: 6}},
+      {id: 789, number: '1.2', state: 'started', config: {java: 8}},
+    ];
+    const jobsSecond = [
+      {id: jobId, number: '1.1', state: 'started', config: {java: 6}},
+      {id: 789, number: '1.2', state: 'passed', config: {java: 8}},
+    ];
+    const auth = authenticate();
+    const travis = api()
+      .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
+      .reply(200, {jobs: jobsFirst})
+      .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
+      .reply(200, {jobs: jobsSecond});
+
+    t.true(await t.context.travisDeployOnce());
+    t.true(auth.isDone());
+    t.true(travis.isDone());
+    t.true(t.context.log.calledWith('Success at attempt 2. All 2 jobs passed.'));
+    t.is(t.context.log.lastCall.args[0], 'All jobs are successful for this build!');
+  }
+);
