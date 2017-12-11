@@ -8,7 +8,12 @@ Run a deployment script only once in the [Travis](https://travis-ci.org/) test m
 
 On Travis builds running multiple jobs (to test with multiple [Node versions](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) and/or [OSs](https://docs.travis-ci.com/user/multi-os/)), run some code from the `after_success` phase only once, after all other jobs have completed successfully.
 
-Your code will run only on the job with the highest node version (i.e. the build leader).
+Your code will run only on the job identified as the build leader, which is determined as follow, by order of priority:
+- The job with the ID defined in [BUILD_LEADER_ID](#build_leader_id).
+- The job configured with the [latest Node version](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) (`node_js: node`).
+- The job with the highest node version
+
+**Note**: If multiple jobs match, the one with the highest job ID (which corresponds to the last one defined in `.travis.yml`) will be identified as the build leader.
 
 ## Install
 

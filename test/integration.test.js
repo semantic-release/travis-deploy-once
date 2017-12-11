@@ -237,11 +237,11 @@ test.serial('Allow to pass GH_TOKEN as parameter', async t => {
   t.is(t.context.log.args[3][0], 'All jobs are successful for this build!');
 });
 
-test.serial('Choose first occurence of the highest version as leader', async t => {
+test.serial('Choose last occurence of the highest version as leader', async t => {
   const jobId = 456;
   process.env.TRAVIS_BUILD_ID = 123;
   process.env.TRAVIS_JOB_ID = jobId;
-  process.env.TRAVIS_JOB_NUMBER = '1.2';
+  process.env.TRAVIS_JOB_NUMBER = '1.1';
   const jobsFirst = [
     {id: 789, number: '1.1', state: 'started', config: {node_js: 8}},
     {id: jobId, number: '1.2', state: 'started', config: {node_js: 8}},
@@ -254,7 +254,7 @@ test.serial('Choose first occurence of the highest version as leader', async t =
   t.is(await t.context.travisDeployOnce(), null);
   t.true(auth.isDone());
   t.true(travis.isDone());
-  t.is(t.context.log.args[2][0], 'The current job (1.2) is not the build leader.');
+  t.is(t.context.log.args[2][0], 'The current job (1.1) is not the build leader.');
 });
 
 test.serial('Return null if none of the job define a Node version', async t => {
