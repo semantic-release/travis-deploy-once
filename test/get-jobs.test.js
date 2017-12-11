@@ -1,8 +1,7 @@
 import test from 'ava';
 import nock from 'nock';
 import getJobs from '../lib/get-jobs';
-import getClient from '../lib/get-client';
-import {authenticate} from './helpers/mock-travis';
+import {api} from './helpers/mock-travis';
 
 test.beforeEach(t => {
   t.context.env = process.env;
@@ -16,42 +15,81 @@ test.afterEach.always(t => {
 });
 
 test.serial('Return job list', async t => {
+  const travisToken = 'TRAVIS_TOKEN';
+  const travisOpts = {};
   const buildId = 123;
   const jobsFirst = [{id: 456, state: 'started'}, {id: 789, state: 'started'}];
   const jobsSecond = [{id: 456, state: 'passed'}, {id: 789, state: 'passed'}];
-  const travis = authenticate();
-  const client = await getClient({}, process.env);
-
-  travis
+  const travis = api({travisOpts, travisToken})
     .get(`/builds/${buildId}`)
     .reply(200, {jobs: jobsFirst})
     .get(`/builds/${buildId}`)
     .reply(200, {jobs: jobsSecond});
 
-  t.deepEqual(jobsFirst, await getJobs(client, buildId));
-  t.deepEqual(jobsSecond, await getJobs(client, buildId));
+  t.deepEqual(jobsFirst, await getJobs(travisOpts, travisToken, buildId));
+  t.deepEqual(jobsSecond, await getJobs(travisOpts, travisToken, buildId));
+  t.true(travis.isDone());
+});
+
+test.serial('Return job list with Travis Pro', async t => {
+  const travisToken = 'TRAVIS_TOKEN';
+  const travisOpts = {pro: true};
+  const buildId = 123;
+  const jobsFirst = [{id: 456, state: 'started'}, {id: 789, state: 'started'}];
+  const jobsSecond = [{id: 456, state: 'passed'}, {id: 789, state: 'passed'}];
+  const travis = api({travisOpts, travisToken})
+    .get(`/builds/${buildId}`)
+    .reply(200, {jobs: jobsFirst})
+    .get(`/builds/${buildId}`)
+    .reply(200, {jobs: jobsSecond});
+
+  t.deepEqual(jobsFirst, await getJobs(travisOpts, travisToken, buildId));
+  t.deepEqual(jobsSecond, await getJobs(travisOpts, travisToken, buildId));
+  t.true(travis.isDone());
+});
+
+test.serial('Return job list with Travis Enterprise', async t => {
+  const travisToken = 'TRAVIS_TOKEN';
+  const travisOpts = {pro: false, enterprise: 'https://travis.example.com'};
+  const buildId = 123;
+  const jobsFirst = [{id: 456, state: 'started'}, {id: 789, state: 'started'}];
+  const jobsSecond = [{id: 456, state: 'passed'}, {id: 789, state: 'passed'}];
+  const travis = api({travisOpts, travisToken})
+    .get(`/builds/${buildId}`)
+    .reply(200, {jobs: jobsFirst})
+    .get(`/builds/${buildId}`)
+    .reply(200, {jobs: jobsSecond});
+
+  t.deepEqual(jobsFirst, await getJobs(travisOpts, travisToken, buildId));
+  t.deepEqual(jobsSecond, await getJobs(travisOpts, travisToken, buildId));
   t.true(travis.isDone());
 });
 
 test.serial('Throws error if GH_TOKEN is not authenticated with Travis', async t => {
+  const travisToken = 'TRAVIS_TOKEN';
+  const travisOpts = {};
   const buildId = 123;
-  const travis = authenticate();
-  const client = await getClient({}, process.env);
+  const travis = api({travisOpts, travisToken})
+    .get(`/builds/${buildId}`)
+    .reply(404, {file: 'not found'});
 
-  travis.get(`/builds/${buildId}`).reply(404, {file: 'not found'});
-
-  await t.throws(getJobs(client, buildId), /The GitHub user of the "GH_TOKEN" has not authenticated Travis CI yet/);
+  await t.throws(
+    getJobs(travisOpts, travisToken, buildId),
+    /The GitHub user of the "GH_TOKEN" has not authenticated Travis CI yet/
+  );
   t.true(travis.isDone());
 });
 
 test.serial('Throws an error if server returns and error', async t => {
+  const travisToken = 'TRAVIS_TOKEN';
+  const travisOpts = {};
   const buildId = 123;
-  const travis = authenticate();
-  const client = await getClient({}, process.env);
+  const travis = api({travisOpts, travisToken})
+    .get(`/builds/${buildId}`)
+    .reply(401);
 
-  travis.get(`/builds/${buildId}`).reply(401);
-
-  const error = await t.throws(getJobs(client, buildId));
-  t.is(error, 401);
+  const error = await t.throws(getJobs(travisOpts, travisToken, buildId), Error);
+  t.is(error.statusCode, 401);
+  t.is(error.name, 'HTTPError');
   t.true(travis.isDone());
 });

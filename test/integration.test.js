@@ -3,7 +3,7 @@ import nock from 'nock';
 import proxyquire from 'proxyquire';
 import {stub} from 'sinon';
 import getLogger from '../lib/get-logger';
-import {authenticate} from './helpers/mock-travis';
+import {authenticate, api} from './helpers/mock-travis';
 
 /* eslint camelcase: ["error", {properties: "never"}] */
 
@@ -34,11 +34,13 @@ test.serial('Return true if there is only one job', async t => {
   process.env.TRAVIS_JOB_ID = 456;
   process.env.TRAVIS_JOB_NUMBER = '1.1';
   const jobs = [{id: process.env.TRAVIS_JOB_ID, number: '1.1', state: 'started', config: {node_js: 8}}];
-  const travis = authenticate();
-
-  travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs});
+  const auth = authenticate();
+  const travis = api()
+    .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
+    .reply(200, {jobs});
 
   t.true(await t.context.travisDeployOnce());
+  t.true(auth.isDone());
   t.true(travis.isDone());
   t.is(t.context.log.lastCall.args[0], 'There is only one job for this build.');
 });
@@ -56,15 +58,15 @@ test.serial('Return true if the current job is the build leader and all other jo
     {id: jobId, number: '1.1', state: 'started', config: {node_js: 8}},
     {id: 789, number: '1.2', state: 'passed', config: {node_js: 6}},
   ];
-  const travis = authenticate();
-
-  travis
+  const auth = authenticate();
+  const travis = api()
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
     .reply(200, {jobs: jobsFirst})
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
     .reply(200, {jobs: jobsSecond});
 
   t.true(await t.context.travisDeployOnce());
+  t.true(auth.isDone());
   t.true(travis.isDone());
   t.true(t.context.log.calledWith('Aborting attempt 1, because of pending job(s): 1.2.'));
   t.true(t.context.log.calledWith('Success at attempt 2. All 2 jobs passed.'));
@@ -86,15 +88,15 @@ test.serial('Works with jobs that are not running on node', async t => {
     {id: jobId, number: '1.2', state: 'started', config: {node_js: 8}},
     {id: 789, number: '1.3', state: 'passed', config: {node_js: 6}},
   ];
-  const travis = authenticate();
-
-  travis
+  const auth = authenticate();
+  const travis = api()
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
     .reply(200, {jobs: jobsFirst})
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
     .reply(200, {jobs: jobsSecond});
 
   t.true(await t.context.travisDeployOnce());
+  t.true(auth.isDone());
   t.true(travis.isDone());
   t.true(t.context.log.calledWith('Success at attempt 2. All 3 jobs passed.'));
   t.is(t.context.log.lastCall.args[0], 'All jobs are successful for this build!');
@@ -113,15 +115,15 @@ test.serial('Return false if the current job is the build leader and another job
     {id: jobId, number: '1.1', state: 'started', config: {node_js: 8}},
     {id: 789, number: '1.2', state: 'errored', config: {node_js: 6}},
   ];
-  const travis = authenticate();
-
-  travis
+  const auth = authenticate();
+  const travis = api()
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
     .reply(200, {jobs: jobsFirst})
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
     .reply(200, {jobs: jobsSecond});
 
   t.false(await t.context.travisDeployOnce());
+  t.true(auth.isDone());
   t.true(travis.isDone());
   t.true(t.context.log.calledWith('Aborting attempt 1, because of pending job(s): 1.2.'));
   t.true(t.context.error.calledWith('Aborting at attempt 2. Job 1.2 failed.'));
@@ -143,11 +145,13 @@ test.serial('Return null if the current job is not the build leader', async t =>
     {id: jobId, number: '1.1', state: 'started', config: {node_js: 6}},
     {id: 789, number: '1.2', state: 'started', config: {node_js: 8}},
   ];
-  const travis = authenticate();
-
-  travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs: jobsFirst});
+  const auth = authenticate();
+  const travis = api()
+    .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
+    .reply(200, {jobs: jobsFirst});
 
   t.is(await t.context.travisDeployOnce(), null);
+  t.true(auth.isDone());
   t.true(travis.isDone());
   t.is(t.context.log.lastCall.args[0], 'The current job (1.1) is not the build leader.');
 });
@@ -168,15 +172,15 @@ test.serial(
       {id: jobId, number: '1.1', state: 'started', config: {node_js: 6}},
       {id: 789, number: '1.2', state: 'passed', config: {node_js: 8}},
     ];
-    const travis = authenticate();
-
-    travis
+    const auth = authenticate();
+    const travis = api()
       .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
       .reply(200, {jobs: jobsFirst})
       .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
       .reply(200, {jobs: jobsSecond});
 
     t.true(await t.context.travisDeployOnce());
+    t.true(auth.isDone());
     t.true(travis.isDone());
     t.true(t.context.log.calledWith('Success at attempt 2. All 2 jobs passed.'));
     t.is(t.context.log.lastCall.args[0], 'All jobs are successful for this build!');
@@ -192,12 +196,13 @@ test.serial('Allow to pass BUILD_LEADER_ID as parameter', async t => {
     {id: jobId, number: '1.1', state: 'started', config: {node_js: 6}},
     {id: 789, number: '1.2', state: 'passed', config: {node_js: 8}},
   ];
-
-  const travis = authenticate();
-
-  travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs: jobsFirst});
+  const auth = authenticate();
+  const travis = api()
+    .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
+    .reply(200, {jobs: jobsFirst});
 
   t.true(await t.context.travisDeployOnce({BUILD_LEADER_ID: 1}));
+  t.true(auth.isDone());
   t.true(travis.isDone());
   t.true(t.context.log.calledWith('Success at attempt 1. All 2 jobs passed.'));
   t.is(t.context.log.lastCall.args[0], 'All jobs are successful for this build!');
@@ -213,11 +218,13 @@ test.serial('Allow to pass GH_TOKEN as parameter', async t => {
     {id: jobId, number: '1.1', state: 'started', config: {node_js: 8}},
     {id: 789, number: '1.2', state: 'passed', config: {node_js: 6}},
   ];
-  const travis = authenticate({GH_TOKEN});
-
-  travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs: jobsFirst});
+  const auth = authenticate({githubToken: GH_TOKEN});
+  const travis = api()
+    .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
+    .reply(200, {jobs: jobsFirst});
 
   t.true(await t.context.travisDeployOnce({GH_TOKEN}));
+  t.true(auth.isDone());
   t.true(travis.isDone());
   t.true(t.context.log.calledWith('Success at attempt 1. All 2 jobs passed.'));
   t.is(t.context.log.lastCall.args[0], 'All jobs are successful for this build!');
@@ -232,11 +239,13 @@ test.serial('Choose first occurence of the highest version as leader', async t =
     {id: 789, number: '1.1', state: 'started', config: {node_js: 8}},
     {id: jobId, number: '1.2', state: 'started', config: {node_js: 8}},
   ];
-  const travis = authenticate();
-
-  travis.get(`/builds/${process.env.TRAVIS_BUILD_ID}`).reply(200, {jobs: jobsFirst});
+  const auth = authenticate();
+  const travis = api()
+    .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
+    .reply(200, {jobs: jobsFirst});
 
   t.is(await t.context.travisDeployOnce(), null);
+  t.true(auth.isDone());
   t.true(travis.isDone());
   t.is(t.context.log.lastCall.args[0], 'The current job (1.2) is not the build leader.');
 });
