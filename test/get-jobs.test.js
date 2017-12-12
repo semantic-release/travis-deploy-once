@@ -3,14 +3,16 @@ import nock from 'nock';
 import getJobs from '../lib/get-jobs';
 import {api} from './helpers/mock-travis';
 
-test.beforeEach(t => {
-  t.context.env = process.env;
-  process.env.TRAVIS_REPO_SLUG = 'test_user/test_repo';
-  process.env.GH_TOKEN = 'GITHUB_TOKEN';
+// Save the current process.env
+const envBackup = Object.assign({}, process.env);
+
+test.beforeEach(() => {
+  process.env = {TRAVIS_REPO_SLUG: 'test_user/test_repo', GH_TOKEN: 'GITHUB_TOKEN'};
 });
 
-test.afterEach.always(t => {
-  process.env = t.context.env;
+test.afterEach.always(() => {
+  // Restore process.env
+  process.env = envBackup;
   nock.cleanAll();
 });
 

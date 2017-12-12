@@ -18,8 +18,8 @@ test('Log with namespace', t => {
   logger.log('test log');
   logger.error('test error');
 
-  t.is(t.context.log.firstCall.args[0], `${chalk.magenta('[Namespace]:')} test log`);
-  t.is(t.context.error.firstCall.args[0], `${chalk.magenta('[Namespace]:')} ${chalk.red('test error')}`);
+  t.is(t.context.log.args[0][0], `${chalk.magenta('[Namespace]:')} test log`);
+  t.is(t.context.error.args[0][0], `${chalk.magenta('[Namespace]:')} ${chalk.red('test error')}`);
 });
 
 test('Log without namespace', t => {
@@ -27,6 +27,6 @@ test('Log without namespace', t => {
   logger.log('test log');
   logger.error('test error');
 
-  t.is(t.context.log.firstCall.args[0], 'test log');
-  t.is(t.context.error.firstCall.args[0], chalk.red('test error'));
+  t.is(t.context.log.args[0][0], 'test log');
+  t.is(t.context.error.args[0][0], chalk.red('test error'));
 });
