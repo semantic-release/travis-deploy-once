@@ -7,14 +7,18 @@ import {authenticate, api} from './helpers/mock-travis';
 
 /* eslint camelcase: ["error", {properties: "never"}] */
 
-let env;
+// Save the current process.env
+const envBackup = Object.assign({}, process.env);
 
 test.beforeEach(t => {
-  env = Object.assign({}, process.env);
   process.env.TRAVIS = 'true';
   process.env.TRAVIS_REPO_SLUG = 'test_user/test_repo';
   process.env.GH_TOKEN = 'GITHUB_TOKEN';
   process.env.TRAVIS_TEST_RESULT = '0';
+  delete process.env.TRAVIS_BUILD_ID;
+  delete process.env.TRAVIS_JOB_ID;
+  delete process.env.TRAVIS_JOB_NUMBER;
+  delete process.env.BUILD_LEADER_ID;
 
   const logger = getLogger();
   t.context.log = stub(logger, 'log');
@@ -27,7 +31,8 @@ test.beforeEach(t => {
 });
 
 test.afterEach.always(() => {
-  process.env = env;
+  // Restore process.env
+  process.env = envBackup;
   nock.cleanAll();
 });
 
@@ -44,7 +49,7 @@ test.serial('Return true if there is only one job', async t => {
   t.true(await t.context.travisDeployOnce());
   t.true(auth.isDone());
   t.true(travis.isDone());
-  t.is(t.context.log.lastCall.args[0], 'There is only one job for this build.');
+  t.is(t.context.log.args[0][0], 'There is only one job for this build.');
 });
 
 test.serial('Return true if the current job is the build leader and all other job passes', async t => {
@@ -70,9 +75,9 @@ test.serial('Return true if the current job is the build leader and all other jo
   t.true(await t.context.travisDeployOnce());
   t.true(auth.isDone());
   t.true(travis.isDone());
-  t.true(t.context.log.calledWith('Aborting attempt 1, because of pending job(s): 1.2.'));
-  t.true(t.context.log.calledWith('Success at attempt 2. All 2 jobs passed.'));
-  t.is(t.context.log.lastCall.args[0], 'All jobs are successful for this build!');
+  t.is(t.context.log.args[2][0], 'Aborting attempt 1, because of pending job(s): 1.2.');
+  t.is(t.context.log.args[3][0], 'Success at attempt 2. All 2 jobs passed.');
+  t.is(t.context.log.args[4][0], 'All jobs are successful for this build!');
 });
 
 test.serial('Works with jobs that are not running on node', async t => {
@@ -100,8 +105,8 @@ test.serial('Works with jobs that are not running on node', async t => {
   t.true(await t.context.travisDeployOnce());
   t.true(auth.isDone());
   t.true(travis.isDone());
-  t.true(t.context.log.calledWith('Success at attempt 2. All 3 jobs passed.'));
-  t.is(t.context.log.lastCall.args[0], 'All jobs are successful for this build!');
+  t.is(t.context.log.args[3][0], 'Success at attempt 2. All 3 jobs passed.');
+  t.is(t.context.log.args[4][0], 'All jobs are successful for this build!');
 });
 
 test.serial('Return false if the current job is the build leader and another job fails', async t => {
@@ -127,15 +132,15 @@ test.serial('Return false if the current job is the build leader and another job
   t.false(await t.context.travisDeployOnce());
   t.true(auth.isDone());
   t.true(travis.isDone());
-  t.true(t.context.log.calledWith('Aborting attempt 1, because of pending job(s): 1.2.'));
-  t.true(t.context.error.calledWith('Aborting at attempt 2. Job 1.2 failed.'));
-  t.is(t.context.error.lastCall.args[0], 'At least one job has failed for this build.');
+  t.is(t.context.log.args[2][0], 'Aborting attempt 1, because of pending job(s): 1.2.');
+  t.is(t.context.error.args[0][0], 'Aborting at attempt 2. Job 1.2 failed.');
+  t.is(t.context.error.args[1][0], 'At least one job has failed for this build.');
 });
 
 test('Return false if test of current jobs have failed', async t => {
   process.env.TRAVIS_TEST_RESULT = '1';
   t.false(await t.context.travisDeployOnce());
-  t.is(t.context.error.lastCall.args[0], 'The current job test phase has failed.');
+  t.is(t.context.error.args[0][0], 'The current job test phase has failed.');
 });
 
 test.serial('Return null if the current job is not the build leader', async t => {
@@ -155,7 +160,7 @@ test.serial('Return null if the current job is not the build leader', async t =>
   t.is(await t.context.travisDeployOnce(), null);
   t.true(auth.isDone());
   t.true(travis.isDone());
-  t.is(t.context.log.lastCall.args[0], 'The current job (1.1) is not the build leader.');
+  t.is(t.context.log.args[2][0], 'The current job (1.1) is not the build leader.');
 });
 
 test.serial(
@@ -184,8 +189,8 @@ test.serial(
     t.true(await t.context.travisDeployOnce());
     t.true(auth.isDone());
     t.true(travis.isDone());
-    t.true(t.context.log.calledWith('Success at attempt 2. All 2 jobs passed.'));
-    t.is(t.context.log.lastCall.args[0], 'All jobs are successful for this build!');
+    t.is(t.context.log.args[1][0], 'Success at attempt 2. All 2 jobs passed.');
+    t.is(t.context.log.args[2][0], 'All jobs are successful for this build!');
   }
 );
 
@@ -206,8 +211,8 @@ test.serial('Allow to pass BUILD_LEADER_ID as parameter', async t => {
   t.true(await t.context.travisDeployOnce({BUILD_LEADER_ID: 1}));
   t.true(auth.isDone());
   t.true(travis.isDone());
-  t.true(t.context.log.calledWith('Success at attempt 1. All 2 jobs passed.'));
-  t.is(t.context.log.lastCall.args[0], 'All jobs are successful for this build!');
+  t.is(t.context.log.args[0][0], 'Success at attempt 1. All 2 jobs passed.');
+  t.is(t.context.log.args[1][0], 'All jobs are successful for this build!');
 });
 
 test.serial('Allow to pass GH_TOKEN as parameter', async t => {
@@ -228,8 +233,8 @@ test.serial('Allow to pass GH_TOKEN as parameter', async t => {
   t.true(await t.context.travisDeployOnce({GH_TOKEN}));
   t.true(auth.isDone());
   t.true(travis.isDone());
-  t.true(t.context.log.calledWith('Success at attempt 1. All 2 jobs passed.'));
-  t.is(t.context.log.lastCall.args[0], 'All jobs are successful for this build!');
+  t.is(t.context.log.args[2][0], 'Success at attempt 1. All 2 jobs passed.');
+  t.is(t.context.log.args[3][0], 'All jobs are successful for this build!');
 });
 
 test.serial('Choose first occurence of the highest version as leader', async t => {
@@ -249,7 +254,7 @@ test.serial('Choose first occurence of the highest version as leader', async t =
   t.is(await t.context.travisDeployOnce(), null);
   t.true(auth.isDone());
   t.true(travis.isDone());
-  t.is(t.context.log.lastCall.args[0], 'The current job (1.2) is not the build leader.');
+  t.is(t.context.log.args[2][0], 'The current job (1.2) is not the build leader.');
 });
 
 test.serial('Return null if none of the job define a Node version', async t => {
@@ -270,10 +275,9 @@ test.serial('Return null if none of the job define a Node version', async t => {
   t.is(await t.context.travisDeployOnce(), null);
   t.true(auth.isDone());
   t.true(travis.isDone());
-  t.true(
-    t.context.log.calledWith(
-      'There is no job in this build defining a node version, please set BUILD_LEADER_ID to define the build leader yourself.'
-    )
+  t.is(
+    t.context.log.args[0][0],
+    'There is no job in this build defining a node version, please set BUILD_LEADER_ID to define the build leader yourself.'
   );
 });
 
@@ -303,7 +307,7 @@ test.serial(
     t.true(await t.context.travisDeployOnce());
     t.true(auth.isDone());
     t.true(travis.isDone());
-    t.true(t.context.log.calledWith('Success at attempt 2. All 2 jobs passed.'));
-    t.is(t.context.log.lastCall.args[0], 'All jobs are successful for this build!');
+    t.is(t.context.log.args[1][0], 'Success at attempt 2. All 2 jobs passed.');
+    t.is(t.context.log.args[2][0], 'All jobs are successful for this build!');
   }
 );

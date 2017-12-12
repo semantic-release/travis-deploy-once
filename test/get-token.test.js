@@ -3,15 +3,16 @@ import nock from 'nock';
 import getToken from '../lib/get-token';
 import {authenticate, unauthorized} from './helpers/mock-travis';
 
-test.beforeEach(t => {
-  t.context.env = process.env;
-  process.env.TRAVIS_REPO_SLUG = 'test_user/test_repo';
-  delete process.env.GH_TOKEN;
-  delete process.env.GITHUB_TOKEN;
+// Save the current process.env
+const envBackup = Object.assign({}, process.env);
+
+test.beforeEach(() => {
+  process.env = {TRAVIS_REPO_SLUG: 'test_user/test_repo'};
 });
 
-test.afterEach.always(t => {
-  process.env = t.context.env;
+test.afterEach.always(() => {
+  // Restore process.env
+  process.env = envBackup;
   nock.cleanAll();
 });
 
