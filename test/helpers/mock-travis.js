@@ -2,9 +2,11 @@ import nock from 'nock';
 
 /* eslint camelcase: ["error", {properties: "never"}] */
 
-export function authenticate(
-  {travisOpts: {pro = false, enterprise} = {}, travisToken = 'TRAVIS_TOKEN', githubToken = process.env.GH_TOKEN} = {}
-) {
+export function authenticate({
+  travisOpts: {pro = false, enterprise} = {},
+  travisToken = 'TRAVIS_TOKEN',
+  githubToken = process.env.GH_TOKEN,
+} = {}) {
   return nock(enterprise || (pro ? 'https://api.travis-ci.com' : 'https://api.travis-ci.org'), {
     reqheaders: {'user-agent': 'Travis'},
   })
