@@ -50,7 +50,7 @@ test.serial('Return job list with Travis Pro', async t => {
 
 test.serial('Return job list with Travis Enterprise', async t => {
   const travisToken = 'TRAVIS_TOKEN';
-  const travisOpts = {pro: false, enterprise: 'https://travis.example.com'};
+  const travisOpts = {pro: false, enterprise: 'https://travis.example.com/api'};
   const buildId = 123;
   const jobsFirst = [{id: 456, state: 'started'}, {id: 789, state: 'started'}];
   const jobsSecond = [{id: 456, state: 'passed'}, {id: 789, state: 'passed'}];

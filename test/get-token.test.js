@@ -57,7 +57,7 @@ test.serial('Authenticate with Travis Pro', async t => {
 
 test.serial('Authenticate with Travis Enterprise', async t => {
   process.env.GH_TOKEN = 'GITHUB_TOKEN';
-  const travisOpts = {pro: true, enterprise: 'https://travis.example.com'};
+  const travisOpts = {pro: true, enterprise: 'https://travis.example.com/api'};
   const travis = authenticate({travisOpts, travisToken: 'test_token'});
   const token = await getToken(travisOpts, process.env);
 
