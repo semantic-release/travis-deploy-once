@@ -23,13 +23,13 @@ const deployOnce = require('travis-deploy-once');
 
 try {
   const result = await deployOnce({travisOpts: {pro: true}, GH_TOKEN: 'xxxxxx', BUILD_LEADER_ID: 1});
+  
+  if (result === true) deployMyThing();
+  if (result === false) console.log('Some job(s) failed');
+  if (result === null) console.log('Did not run as the build leader');
 } catch (err) {
   // something went wrong, and err will tell you what
 }
-
-if (result === true) deployMyThing();
-if (result === false) console.log('Some job(s) failed');
-if (result === null) console.log('Did not run as the build leader');
 ```
 
 ## API
