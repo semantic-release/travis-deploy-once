@@ -3,6 +3,24 @@
   "description": "Run a deployment script only once in the Travis test matrix",
   "version": "0.0.0-development",
   "author": "Stephan Bönnemann <stephan@boennemann.me>",
+  "ava": {
+    "require": [
+      "babel-register",
+      "babel-polyfill"
+    ]
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ]
+    ]
+  },
   "bugs": {
     "url": "https://github.com/semantic-release/travis-deploy-once/issues"
   },
@@ -12,6 +30,9 @@
     }
   },
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
     "chalk": "^2.1.0",
     "got": "^8.0.1",
     "p-retry": "^1.0.0",
@@ -51,7 +72,8 @@
   "main": "index.js",
   "nyc": {
     "include": [
-      "lib/**/*.js"
+      "lib/**/*.js",
+      "index.js"
     ],
     "reporter": [
       "json",
