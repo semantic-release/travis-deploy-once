@@ -11,6 +11,7 @@ test.beforeEach(() => {
 });
 
 test.afterEach.always(() => {
+  delete process.env.TRAVIS_URL;
   // Restore process.env
   process.env = envBackup;
   nock.cleanAll();
@@ -57,6 +58,24 @@ test.serial('Return job list with Travis Enterprise', async t => {
   const jobsFirst = [{id: 456, state: 'started'}, {id: 789, state: 'started'}];
   const jobsSecond = [{id: 456, state: 'passed'}, {id: 789, state: 'passed'}];
   const travis = api({travisOpts, travisToken})
+    .get(`/builds/${buildId}`)
+    .reply(200, {jobs: jobsFirst})
+    .get(`/builds/${buildId}`)
+    .reply(200, {jobs: jobsSecond});
+
+  t.deepEqual(jobsFirst, await getJobs(travisOpts, travisToken, buildId));
+  t.deepEqual(jobsSecond, await getJobs(travisOpts, travisToken, buildId));
+  t.true(travis.isDone());
+});
+
+test.serial('Return job list with Travis Enterprise set with TRAVIS_URL', async t => {
+  process.env.TRAVIS_URL = 'https://travis.example.com/api';
+  const travisToken = 'TRAVIS_TOKEN';
+  const travisOpts = {pro: false};
+  const buildId = 123;
+  const jobsFirst = [{id: 456, state: 'started'}, {id: 789, state: 'started'}];
+  const jobsSecond = [{id: 456, state: 'passed'}, {id: 789, state: 'passed'}];
+  const travis = api({travisOpts: {pro: false, enterprise: 'https://travis.example.com/api'}, travisToken})
     .get(`/builds/${buildId}`)
     .reply(200, {jobs: jobsFirst})
     .get(`/builds/${buildId}`)

@@ -9,20 +9,88 @@ Run a deployment script only once in the [Travis](https://travis-ci.org/) test m
 On Travis builds running multiple jobs (to test with multiple [Node versions](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) and/or [OSs](https://docs.travis-ci.com/user/multi-os/)), run some code from the `after_success` phase only once, after all other jobs have completed successfully.
 
 Your code will run only on the job identified as the build leader, which is determined as follow, by order of priority:
-- The job with the ID defined in [BUILD_LEADER_ID](#build_leader_id).
+- The job with the ID defined in the [-b](#-b---buildleaderid), [--buildLeaderId](#-b---buildleaderid) CLI options or the [buildLeaderId](#buildleaderid) API option or `BUILD_LEADER_ID` environment variable.
 - The job configured with the [latest Node version](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) (`node_js: node`).
 - The job configured with the [lts Node version](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) (`node_js: lts/*`).
 - The job with the highest node version
 
 **Note**: If multiple jobs match, the one with the highest job ID (which corresponds to the last one defined in `.travis.yml`) will be identified as the build leader.
 
-## Install
+## CLI
+
+### CLI usage
+
+In `.travis.yml`:
+
+```yaml
+language: node_js
+node_js:
+  - 8
+  - 6
+  - 4
+os:
+  - osx
+  - linux
+after_success:
+  - npm install -g travis-deploy-once
+  - travis-deploy-once "deploy-script --script-arg script-arg-value"
+```
+
+The script `deploy-script` will be called only for the node 8 job running on `linux`. It will be passed the arguments `--script-arg script-arg-value`.
+
+### CLI options
+
+#### -t, --githubToken
+
+Type: `String`
+Default: `GH_TOKEN` or `GITHUB_TOKEN` environment variable
+
+GitHub OAuth token.
+
+#### -b, --buildLeaderId
+
+Type: `Number`
+Default: `BUILD_LEADER_ID` environment variable
+
+Define which Travis job will run the script (build leader). If not defined the build leader will be the Travis job running on the highest Node version.
+
+#### -p, --pro
+
+Type: `Boolean`
+Default: `false`
+
+`true` to use [Travis Pro](https://travis-ci.com), `false` to use [Travis for Open Source](https://travis-ci.org).
+
+#### -u, --travis-url
+
+Type: `String`
+Default: `TRAVIS_URL` environment variable
+
+[Travis Enterprise](https://enterprise.travis-ci.com) URL. If defined, the [-p, --pro](#-p---pro) option will be ignored.
+
+**Note**: This is the URL of the API endpoint, for example `https://travis.example.com/api`.
+
+#### -h, --help
+
+Type: `Boolean`
+
+Show help.
+
+#### -v, --version
+
+Type: `Boolean`
+
+Show version number.
+
+## API
+
+### API usage
 
 ```bash
 npm install --save travis-deploy-once
 ```
 
-## Usage
+In the module `my-module`:
 
 ```js
 const deployOnce = require('travis-deploy-once');
@@ -38,9 +106,24 @@ try {
 }
 ```
 
-## API
+In `.travis.yml`:
 
-### deployOnce([options])
+```yaml
+language: node_js
+node_js:
+  - 8
+  - 6
+  - 4
+os:
+  - osx
+  - linux
+after_success:
+  - npm run my-module
+```
+
+The script `my-module` with be called for each node version on both OSs and `deployMyThing` will be called only for the node 8 job running on `linux`.
+
+### Function `deployOnce([options])`
 
 Returns a `Promise` that resolves to:
 - `true` if the current Travis job is the build leader, the current `script` phase is successful and all other job have completed successfully. => Your code can safely run.
@@ -69,7 +152,7 @@ GitHub OAuth token.
 Type: `Number`
 Default: `process.env.BUILD_LEADER_ID`
 
-Defined which Travis job will run the script (build leader). If not defined the build leader will be the Travis job running on the highest Node version.
+Define which Travis job will run the script (build leader). If not defined the build leader will be the Travis job running on the highest Node version.
 
 ##### travisOpts
 
@@ -85,6 +168,7 @@ Default: `false`
 ###### enterprise
 
 Type: `String`
+Default: `process.env.TRAVIS_URL`
 
 [Travis Enterprise](https://enterprise.travis-ci.com) URL. If defined, the [pro](#pro) option will be ignored.
 

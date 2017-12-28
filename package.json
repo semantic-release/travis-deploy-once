@@ -21,6 +21,9 @@
       ]
     ]
   },
+  "bin": {
+    "travis-deploy-once": "bin/travis-deploy-once.js"
+  },
   "bugs": {
     "url": "https://github.com/semantic-release/travis-deploy-once/issues"
   },
@@ -34,13 +37,17 @@
     "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "chalk": "^2.1.0",
+    "execa": "^0.8.0",
     "got": "^8.0.1",
     "p-retry": "^1.0.0",
     "semver": "^5.4.1",
-    "url-join": "^2.0.2"
+    "update-notifier": "^2.3.0",
+    "url-join": "^2.0.2",
+    "yargs": "^10.0.3"
   },
   "devDependencies": {
     "ava": "^0.24.0",
+    "clear-module": "^2.1.0",
     "codecov": "^3.0.0",
     "commitizen": "^2.9.6",
     "cz-conventional-changelog": "^2.0.0",
@@ -58,8 +65,10 @@
     "node": ">=4"
   },
   "files": [
+    "bin",
+    "lib",
     "index.js",
-    "lib"
+    "cli.js"
   ],
   "homepage": "https://github.com/semantic-release/travis-deploy-once#readme",
   "keywords": [
@@ -73,7 +82,8 @@
   "nyc": {
     "include": [
       "lib/**/*.js",
-      "index.js"
+      "index.js",
+      "cli.js"
     ],
     "reporter": [
       "json",
