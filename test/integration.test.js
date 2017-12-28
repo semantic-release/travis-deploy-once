@@ -14,6 +14,7 @@ test.beforeEach(t => {
   process.env.TRAVIS = 'true';
   process.env.TRAVIS_REPO_SLUG = 'test_user/test_repo';
   process.env.GH_TOKEN = 'GITHUB_TOKEN';
+  delete process.env.GITHUB_TOKEN;
   process.env.TRAVIS_TEST_RESULT = '0';
   delete process.env.TRAVIS_BUILD_ID;
   delete process.env.TRAVIS_JOB_ID;
@@ -23,7 +24,7 @@ test.beforeEach(t => {
   const logger = getLogger();
   t.context.log = stub(logger, 'log');
   t.context.error = stub(logger, 'error');
-  t.context.travisDeployOnce = proxyquire('../index', {
+  t.context.travisDeployOnce = proxyquire('..', {
     './lib/travis-deploy-once': proxyquire('../lib/travis-deploy-once', {
       './get-logger': () => logger,
     }),
@@ -194,7 +195,7 @@ test.serial(
   }
 );
 
-test.serial('Allow to pass BUILD_LEADER_ID as parameter', async t => {
+test.serial('Allow to pass "buildLeaderId" as parameter', async t => {
   const jobId = 456;
   process.env.TRAVIS_BUILD_ID = 123;
   process.env.TRAVIS_JOB_ID = jobId;
@@ -208,15 +209,15 @@ test.serial('Allow to pass BUILD_LEADER_ID as parameter', async t => {
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
     .reply(200, {jobs: jobsFirst});
 
-  t.true(await t.context.travisDeployOnce({BUILD_LEADER_ID: 1}));
+  t.true(await t.context.travisDeployOnce({buildLeaderId: 1}));
   t.true(auth.isDone());
   t.true(travis.isDone());
   t.is(t.context.log.args[0][0], 'Success at attempt 1. All 2 jobs passed.');
   t.is(t.context.log.args[1][0], 'All jobs are successful for this build!');
 });
 
-test.serial('Allow to pass GH_TOKEN as parameter', async t => {
-  const GH_TOKEN = 'TEST_TOKEN';
+test.serial('Allow to pass githubToken as parameter', async t => {
+  const githubToken = 'TEST_TOKEN';
   const jobId = 456;
   process.env.TRAVIS_BUILD_ID = 123;
   process.env.TRAVIS_JOB_ID = jobId;
@@ -225,12 +226,12 @@ test.serial('Allow to pass GH_TOKEN as parameter', async t => {
     {id: jobId, number: '1.1', state: 'started', config: {node_js: 8}},
     {id: 789, number: '1.2', state: 'passed', config: {node_js: 6}},
   ];
-  const auth = authenticate({githubToken: GH_TOKEN});
+  const auth = authenticate({githubToken});
   const travis = api()
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
     .reply(200, {jobs: jobsFirst});
 
-  t.true(await t.context.travisDeployOnce({GH_TOKEN}));
+  t.true(await t.context.travisDeployOnce({githubToken}));
   t.true(auth.isDone());
   t.true(travis.isDone());
   t.is(t.context.log.args[2][0], 'Success at attempt 1. All 2 jobs passed.');

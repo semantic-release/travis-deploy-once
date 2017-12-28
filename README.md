@@ -28,7 +28,7 @@ npm install --save travis-deploy-once
 const deployOnce = require('travis-deploy-once');
 
 try {
-  const result = await deployOnce({travisOpts: {pro: true}, GH_TOKEN: 'xxxxxx', BUILD_LEADER_ID: 1});
+  const result = await deployOnce({travisOpts: {pro: true}, githubToken: 'xxxxxx', buildLeaderId: 1});
 
   if (result === true) deployMyThing();
   if (result === false) console.log('Some job(s) failed');
@@ -57,14 +57,14 @@ Throws an `Error` if:
 
 Type: `Object`
 
-##### GH_TOKEN
+##### githubToken
 
 Type: `String`
 Default: `process.env.GH_TOKEN` or `process.env.GITHUB_TOKEN`
 
 GitHub OAuth token.
 
-##### BUILD_LEADER_ID
+##### buildLeaderId
 
 Type: `Number`
 Default: `process.env.BUILD_LEADER_ID`
