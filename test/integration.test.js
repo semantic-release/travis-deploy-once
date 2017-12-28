@@ -20,6 +20,7 @@ test.beforeEach(t => {
   delete process.env.TRAVIS_JOB_ID;
   delete process.env.TRAVIS_JOB_NUMBER;
   delete process.env.BUILD_LEADER_ID;
+  delete process.env.TRAVIS_URL;
 
   const logger = getLogger();
   t.context.log = stub(logger, 'log');
