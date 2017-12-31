@@ -18,7 +18,13 @@ Your code will run only on the job identified as the build leader, which is dete
 
 ## CLI
 
-### CLI usage
+```bash
+Usage: travis-deploy-once.js [script]
+```
+
+### CLI usage with script argument
+
+Run the `script` passed in the first argument only if the current job is the build leader and all other jobs are successful and return with the exit code of the script. Return with exit code `0` otherwise.
 
 In `.travis.yml`:
 
@@ -34,6 +40,28 @@ os:
 after_success:
   - npm install -g travis-deploy-once
   - travis-deploy-once "deploy-script --script-arg script-arg-value"
+```
+
+The script `deploy-script` will be called only for the node 8 job running on `linux`. It will be passed the arguments `--script-arg script-arg-value`.
+
+### CLI usage without script argument
+
+Return with exit code `0` if the current job is the build leader and all other jobs are successful. Return with exit code `1` otherwise.
+
+In `.travis.yml`:
+
+```yaml
+language: node_js
+node_js:
+  - 8
+  - 6
+  - 4
+os:
+  - osx
+  - linux
+after_success:
+  - npm install -g travis-deploy-once
+  - travis-deploy-once && deploy-script --script-arg script-arg-value
 ```
 
 The script `deploy-script` will be called only for the node 8 job running on `linux`. It will be passed the arguments `--script-arg script-arg-value`.
