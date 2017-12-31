@@ -11,6 +11,7 @@ On Travis builds running multiple jobs (to test with multiple [Node versions](ht
 Your code will run only on the job identified as the build leader, which is determined as follow, by order of priority:
 - The job with the ID defined in [BUILD_LEADER_ID](#build_leader_id).
 - The job configured with the [latest Node version](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) (`node_js: node`).
+- The job configured with the [lts Node version](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) (`node_js: lts/*`).
 - The job with the highest node version
 
 **Note**: If multiple jobs match, the one with the highest job ID (which corresponds to the last one defined in `.travis.yml`) will be identified as the build leader.
@@ -28,7 +29,7 @@ const deployOnce = require('travis-deploy-once');
 
 try {
   const result = await deployOnce({travisOpts: {pro: true}, GH_TOKEN: 'xxxxxx', BUILD_LEADER_ID: 1});
-  
+
   if (result === true) deployMyThing();
   if (result === false) console.log('Some job(s) failed');
   if (result === null) console.log('Did not run as the build leader');
