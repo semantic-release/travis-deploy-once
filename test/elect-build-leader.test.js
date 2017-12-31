@@ -21,9 +21,15 @@ test('Find highest node version with integer version', t => {
 });
 
 test('Select "latest stable" as highest node version', t => {
-  t.is(electBuildLeader(['8', '4', '1', 'node', '0.1', 'lts', 'argon', '0.10', '8.4', '4.0.1'], t.context.logger), 4);
+  t.is(electBuildLeader(['8', '4', '1', 'iojs', 'lts/*', 'node', '0.1', 'argon', '0.10', '8.4'], t.context.logger), 6);
   t.is(t.context.log.callCount, 2);
-  t.is(t.context.log.args[1][0], 'Elect job 4 as build leader as it runs on the latest node stable version.');
+  t.is(t.context.log.args[1][0], 'Elect job 6 as build leader as it runs on the latest node stable version.');
+});
+
+test('Select "latest lts" as highest node version', t => {
+  t.is(electBuildLeader(['8', '4', '1', 'lts/*', '0.1', 'argon', '0.10', '8.4'], t.context.logger), 4);
+  t.is(t.context.log.callCount, 2);
+  t.is(t.context.log.args[1][0], 'Elect job 4 as build leader as it runs on the node lts version.');
 });
 
 test('Find highest node version with version range', t => {
