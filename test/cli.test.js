@@ -40,6 +40,15 @@ test.serial('Execute the script and return with script exit code if travis-deplo
   t.is(process.exitCode, 100);
 });
 
+test.serial('If no script is set, return with exit code 0 if travis-deploy-once returns "true"', async t => {
+  const travisDeployOnce = stub().resolves(true);
+  const cli = proxyquire('../cli', {'./lib/travis-deploy-once': travisDeployOnce});
+
+  process.argv = ['', ''];
+  await cli();
+  t.is(process.exitCode, 0);
+});
+
 test.serial('Do not execute the script and return with exit code 0 if travis-deploy-once returns "false"', async t => {
   const travisDeployOnce = stub().resolves(false);
   const cli = proxyquire('../cli', {'./lib/travis-deploy-once': travisDeployOnce});
@@ -50,6 +59,15 @@ test.serial('Do not execute the script and return with exit code 0 if travis-dep
   t.falsy(process.exitCode);
 });
 
+test.serial('If no script is set, return with exit code 1 if travis-deploy-once returns "false"', async t => {
+  const travisDeployOnce = stub().resolves(false);
+  const cli = proxyquire('../cli', {'./lib/travis-deploy-once': travisDeployOnce});
+
+  process.argv = ['', ''];
+  await cli();
+  t.is(process.exitCode, 1);
+});
+
 test.serial('Do not execute the script and return with exit code 0 if travis-deploy-once returns "null"', async t => {
   const travisDeployOnce = stub().resolves(null);
   const cli = proxyquire('../cli', {'./lib/travis-deploy-once': travisDeployOnce});
@@ -58,6 +76,15 @@ test.serial('Do not execute the script and return with exit code 0 if travis-dep
   await cli();
   t.notRegex(t.context.logs, /Test script/);
   t.falsy(process.exitCode);
+});
+
+test.serial('If no script is set, return with exit code 1 if travis-deploy-once returns "null"', async t => {
+  const travisDeployOnce = stub().resolves(null);
+  const cli = proxyquire('../cli', {'./lib/travis-deploy-once': travisDeployOnce});
+
+  process.argv = ['', ''];
+  await cli();
+  t.is(process.exitCode, 1);
 });
 
 test.serial('Do not execute the script and return with exit code 1 if travis-deploy-once throws an error', async t => {
@@ -103,19 +130,6 @@ test.serial('Pass options to travis-deploy-once', async t => {
   ]);
   t.regex(t.context.logs, /Test script/);
   t.is(process.exitCode, 0);
-});
-
-test.serial('Return an error if there is no script argument set', async t => {
-  const travisDeployOnce = stub().resolves(true);
-  const cli = proxyquire('../cli', {'./lib/travis-deploy-once': travisDeployOnce});
-
-  process.argv = ['', ''];
-  await cli();
-
-  t.notRegex(t.context.logs, /Test script/);
-  // Check that the CLI display the help message
-  t.regex(t.context.errors, /Run a deployment script only once in the Travis test matrix/);
-  t.is(process.exitCode, 1);
 });
 
 test.serial('Return an error if there is multiple script argument set', async t => {

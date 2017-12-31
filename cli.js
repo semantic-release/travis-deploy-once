@@ -7,10 +7,10 @@ updateNotifier({pkg, updateCheckInterval: 0}).notify();
 
 module.exports = async () => {
   const cli = require('yargs')
-    .command('$0 <script>', 'Run a deployment script only once in the Travis test matrix', yargs => {
+    .command('$0 [script]', 'Run a deployment script only once in the Travis test matrix', yargs => {
       yargs
         .positional('script', {describe: 'The script to run once', type: 'string'})
-        .demandCommand(0, 0, 'The script argument is required', 'Only one script argument is allowed')
+        .demandCommand(0, 0, '', 'Only one script argument is allowed')
         .example('travis-deploy-once --buildLeaderId 1 "deploy-script --script-arg script-arg-value"');
     })
     .alias('h', 'help')
@@ -46,10 +46,16 @@ module.exports = async () => {
     if (
       (await require('./lib/travis-deploy-once')({travisOpts: {pro, enterprise}, buildLeaderId, githubToken})) === true
     ) {
-      const shell = execa.shell(script, {reject: false});
-      shell.stdout.pipe(process.stdout);
-      shell.stderr.pipe(process.stderr);
-      process.exitCode = (await shell).code;
+      if (script) {
+        const shell = execa.shell(script, {reject: false});
+        shell.stdout.pipe(process.stdout);
+        shell.stderr.pipe(process.stderr);
+        process.exitCode = (await shell).code;
+      } else {
+        process.exitCode = 0;
+      }
+    } else if (!script) {
+      process.exitCode = 1;
     }
   } catch (err) {
     if (err.name !== 'YError') {
