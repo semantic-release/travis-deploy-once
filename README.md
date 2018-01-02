@@ -6,7 +6,7 @@ Run a deployment script only once in the [Travis](https://travis-ci.org/) test m
 [![Codecov](https://img.shields.io/codecov/c/github/semantic-release/travis-deploy-once.svg)](https://codecov.io/gh/semantic-release/travis-deploy-once)
 [![Greenkeeper badge](https://badges.greenkeeper.io/semantic-release/travis-deploy-once.svg)](https://greenkeeper.io/)
 
-**Note**: Travis now offer the [Build Stages](https://docs.travis-ci.com/user/build-stages) beta feature. We recommend to use Build Stages instead of `travis-deploy-once`, if possible, as it's a clearer and more flexible way to orchestrate jobs within a build.
+**Note**: Travis supports [Build Stages](https://docs.travis-ci.com/user/build-stages) as a beta feature. We recommend to use Build Stages instead of `travis-deploy-once` if possible. It’s a clearer and more flexible way to orchestrate jobs within a build.
 
 On Travis builds running multiple jobs (to test with multiple [Node versions](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) and/or [OSs](https://docs.travis-ci.com/user/multi-os/)), run some code from the `after_success` phase only once, after all other jobs have completed successfully.
 
