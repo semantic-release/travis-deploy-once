@@ -13,6 +13,7 @@ Your code will run only on the job identified as the build leader, which is dete
 - The job configured with the [latest Node version](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) (`node_js: node`).
 - The job configured with the [lts Node version](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) (`node_js: lts/*`).
 - The job with the highest node version
+- The job with the highest job number if none of the jobs specify a node version (see [#42](https://github.com/semantic-release/travis-deploy-once/pull/42))
 
 **Note**: If multiple jobs match, the one with the highest job ID (which corresponds to the last one defined in `.travis.yml`) will be identified as the build leader.
 
