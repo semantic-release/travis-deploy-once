@@ -15,7 +15,6 @@ test.beforeEach(t => {
   process.env.TRAVIS_REPO_SLUG = 'test_user/test_repo';
   process.env.GH_TOKEN = 'GITHUB_TOKEN';
   delete process.env.GITHUB_TOKEN;
-  process.env.TRAVIS_TEST_RESULT = '0';
   delete process.env.TRAVIS_BUILD_ID;
   delete process.env.TRAVIS_JOB_ID;
   delete process.env.TRAVIS_JOB_NUMBER;
@@ -137,12 +136,6 @@ test.serial('Return false if the current job is the build leader and another job
   t.is(t.context.log.args[2][0], 'Aborting attempt 1, because of pending job(s): 1.2.');
   t.is(t.context.error.args[0][0], 'Aborting at attempt 2. Job 1.2 failed.');
   t.is(t.context.error.args[1][0], 'At least one job has failed for this build.');
-});
-
-test('Return false if test of current jobs have failed', async t => {
-  process.env.TRAVIS_TEST_RESULT = '1';
-  t.false(await t.context.travisDeployOnce());
-  t.is(t.context.error.args[0][0], 'The current job test phase has failed.');
 });
 
 test.serial('Return null if the current job is not the build leader', async t => {
