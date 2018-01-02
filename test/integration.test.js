@@ -259,27 +259,27 @@ test.serial('Choose last occurence of the highest version as leader', async t =>
   t.is(t.context.log.args[2][0], 'The current job (1.1) is not the build leader.');
 });
 
-test.serial('Return null if none of the job define a Node version', async t => {
-  const jobId = 456;
+test.serial('Use the last job as leader if none of the job define a Node version', async t => {
+  const jobId = 789;
   process.env.TRAVIS_BUILD_ID = 123;
   process.env.TRAVIS_JOB_ID = jobId;
-  process.env.TRAVIS_JOB_NUMBER = '1.2';
+  process.env.TRAVIS_JOB_NUMBER = '1.3';
   const jobsFirst = [
-    {id: 111, number: '1.1', state: 'started', config: {java: 8}},
-    {id: jobId, number: '1.2', state: 'started', config: {java: 7}},
-    {id: 789, number: '1.3', state: 'passed', config: {java: 6}},
+    {id: 123, number: '1.1', state: 'passed', config: {java: 6}},
+    {id: 456, number: '1.2', state: 'passed', config: {java: 7}},
+    {id: jobId, number: '1.3', state: 'started', config: {java: 8}},
   ];
   const auth = authenticate();
   const travis = api()
     .get(`/builds/${process.env.TRAVIS_BUILD_ID}`)
     .reply(200, {jobs: jobsFirst});
 
-  t.is(await t.context.travisDeployOnce(), null);
+  t.true(await t.context.travisDeployOnce());
   t.true(auth.isDone());
   t.true(travis.isDone());
   t.is(
     t.context.log.args[0][0],
-    'There is no job in this build defining a node version, please set BUILD_LEADER_ID to define the build leader yourself.'
+    'There is no job in this build defining a node version. Electing job (3) as build leader.'
   );
 });
 
