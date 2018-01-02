@@ -8,7 +8,9 @@ Run a deployment script only once in the [Travis](https://travis-ci.org/) test m
 
 **Note**: Travis supports [Build Stages](https://docs.travis-ci.com/user/build-stages) as a beta feature. We recommend to use Build Stages instead of `travis-deploy-once` if possible. It’s a clearer and more flexible way to orchestrate jobs within a build.
 
-On Travis builds running multiple jobs (to test with multiple [Node versions](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) and/or [OSs](https://docs.travis-ci.com/user/multi-os/)), run some code from the `after_success` phase only once, after all other jobs have completed successfully.
+For Travis builds running multiple jobs (to test with multiple [Node versions](https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Specifying-Node.js-versions) and/or [OSs](https://docs.travis-ci.com/user/multi-os)), `travis-deploy-once` run some code only once, after all other jobs have completed successfully.
+
+`travis-deploy-once` is usually used in the `after_success` step. But if you want your build to break in case the `travis-deploy-once` script returns an error, you can set it in the `script` or `before_script` step (see [Travis Build Lifecycle](https://docs.travis-ci.com/user/customizing-the-build/#The-Build-Lifecycle)).
 
 Your code will run only on the job identified as the build leader, which is determined as follow, by order of priority:
 - The job with the ID defined in the [-b](#-b---buildleaderid), [--buildLeaderId](#-b---buildleaderid) CLI options or the [buildLeaderId](#buildleaderid) API option or `BUILD_LEADER_ID` environment variable.
@@ -165,7 +167,6 @@ Throws an `Error` if:
 - It doesn't run on Travis.
 - The Github authentication token is missing.
 - The Github authentication token is not authorized with Travis.
-- It doesn't run on after_success step.
 
 #### options
 
