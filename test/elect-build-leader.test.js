@@ -49,3 +49,9 @@ test('Select the last occurence of the "latest stable"', t => {
   t.true(t.context.log.calledTwice);
   t.is(t.context.log.args[1][0], 'Electing job (5) as build leader as it runs on the latest node stable version.');
 });
+
+test('Select the last occurence of the "stable" version', t => {
+  t.is(electBuildLeader(['stable', '8', '9', 'node', 'stable'], t.context.logger), 5);
+  t.true(t.context.log.calledTwice);
+  t.is(t.context.log.args[1][0], 'Electing job (5) as build leader as it runs on the latest node stable version.');
+});
