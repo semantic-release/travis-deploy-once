@@ -42,7 +42,7 @@
     "p-retry": "^1.0.0",
     "semver": "^5.4.1",
     "update-notifier": "^2.3.0",
-    "url-join": "^3.0.0",
+    "url-join": "^4.0.0",
     "yargs": "^11.0.0"
   },
   "devDependencies": {
