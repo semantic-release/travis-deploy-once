@@ -35,7 +35,6 @@ test.serial('Execute the script and return with script exit code if travis-deplo
   process.argv = ['', '', 'echo Test script && exit 100'];
   await cli();
 
-  console.error(t.context.logs);
   t.regex(t.context.logs, /Test script/);
   t.is(process.exitCode, 100);
 });
