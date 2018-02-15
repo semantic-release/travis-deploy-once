@@ -51,11 +51,8 @@
     "codecov": "^3.0.0",
     "commitizen": "^2.9.6",
     "cz-conventional-changelog": "^2.0.0",
-    "eslint-config-prettier": "^2.5.0",
-    "eslint-plugin-prettier": "^2.3.0",
     "nock": "^9.0.18",
     "nyc": "^11.2.1",
-    "prettier": "~1.10.0",
     "proxyquire": "^1.8.0",
     "semantic-release": "^12.2.2",
     "sinon": "^4.0.0",
@@ -93,10 +90,7 @@
     "all": true
   },
   "prettier": {
-    "printWidth": 120,
-    "singleQuote": true,
-    "bracketSpacing": false,
-    "trailingComma": "es5"
+    "printWidth": 120
   },
   "repository": {
     "type": "git",
@@ -111,14 +105,7 @@
     "test": "nyc ava -v"
   },
   "xo": {
-    "extends": [
-      "prettier"
-    ],
-    "plugins": [
-      "prettier"
-    ],
-    "rules": {
-      "prettier/prettier": 2
-    }
+    "prettier": true,
+    "space": true
   }
 }
