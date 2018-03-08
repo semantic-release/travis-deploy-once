@@ -3,6 +3,8 @@ import nock from 'nock';
 import getToken from '../lib/get-token';
 import {authenticate, unauthorized} from './helpers/mock-travis';
 
+/* eslint camelcase: ["error", {properties: "never"}] */
+
 // Save the current process.env
 const envBackup = Object.assign({}, process.env);
 
@@ -69,9 +71,26 @@ test.serial('Authenticate with Travis Enterprise', async t => {
 test.serial('Throws and Error if "githubToken" is un-authorized on Travis', async t => {
   const githubToken = 'GITHUB_TOKEN';
   const travis = unauthorized();
-  const error = await t.throws(getToken({pro: false}, githubToken));
+  const error = await t.throws(getToken({pro: false}, githubToken, {retries: 0}));
 
   t.is(error.name, 'HTTPError');
   t.is(error.statusCode, 401);
+  t.true(travis.isDone());
+});
+
+test.serial('Retries 5 times', async t => {
+  const githubToken = 'GITHUB_TOKEN';
+  const travisOpts = {pro: false};
+
+  const travis = nock('https://api.travis-ci.org', {reqheaders: {'user-agent': 'Travis'}})
+    .post('/auth/github', {github_token: githubToken})
+    .times(5)
+    .reply(403)
+    .post('/auth/github', {github_token: githubToken})
+    .reply(200, {access_token: 'TRAVIS_TOKEN'});
+
+  const token = await getToken(travisOpts, githubToken, {minTimeout: 0});
+
+  t.is(token, 'TRAVIS_TOKEN');
   t.true(travis.isDone());
 });

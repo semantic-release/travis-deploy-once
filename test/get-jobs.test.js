@@ -95,7 +95,7 @@ test.serial('Throws error if GH_TOKEN is not authenticated with Travis', async t
     .reply(404, {file: 'not found'});
 
   await t.throws(
-    getJobs(travisOpts, travisToken, buildId),
+    getJobs(travisOpts, travisToken, buildId, {retries: 0}),
     /The GitHub user of the "GH_TOKEN" has not authenticated Travis CI yet/
   );
   t.true(travis.isDone());
@@ -109,8 +109,24 @@ test.serial('Throws an error if server returns and error', async t => {
     .get(`/builds/${buildId}`)
     .reply(401);
 
-  const error = await t.throws(getJobs(travisOpts, travisToken, buildId), Error);
+  const error = await t.throws(getJobs(travisOpts, travisToken, buildId, {retries: 0}), Error);
   t.is(error.statusCode, 401);
   t.is(error.name, 'HTTPError');
+  t.true(travis.isDone());
+});
+
+test.serial('Retries 5 times', async t => {
+  const travisToken = 'TRAVIS_TOKEN';
+  const travisOpts = {};
+  const buildId = 123;
+  const jobsFirst = [{id: 456, state: 'started'}, {id: 789, state: 'started'}];
+  const travis = api({travisOpts, travisToken})
+    .get(`/builds/${buildId}`)
+    .times(5)
+    .reply(403)
+    .get(`/builds/${buildId}`)
+    .reply(200, {jobs: jobsFirst});
+
+  t.deepEqual(jobsFirst, await getJobs(travisOpts, travisToken, buildId, {minTimeout: 0}));
   t.true(travis.isDone());
 });
