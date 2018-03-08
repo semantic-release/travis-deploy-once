@@ -49,11 +49,10 @@ test.serial('Wait for jobs to complete, ignoring current one and return true', a
     .reply(200, {jobs: jobsThird});
 
   t.true(
-    await waitForOtherJobs(travisOpts, travisToken, buildId, currentJobId, jobsFirst, t.context.logger, {
-      forever: true,
-      factor: 1,
-      minTimeout: 1,
-    })
+    await waitForOtherJobs(
+      {travisOpts, travisToken, buildId, currentJobId, initialJobs: jobsFirst, logger: t.context.logger},
+      {forever: true, factor: 1, minTimeout: 1}
+    )
   );
 
   t.is(t.context.log.callCount, 3);
@@ -90,11 +89,10 @@ test.serial('Return false as soon as a job fails', async t => {
     .reply(200, {jobs: jobsThird});
 
   t.false(
-    await waitForOtherJobs(travisOpts, travisToken, buildId, currentJobId, jobsFirst, t.context.logger, {
-      forever: true,
-      factor: 1,
-      minTimeout: 1,
-    })
+    await waitForOtherJobs(
+      {travisOpts, travisToken, buildId, currentJobId, initialJobs: jobsFirst, logger: t.context.logger},
+      {forever: true, factor: 1, minTimeout: 1}
+    )
   );
 
   t.is(t.context.log.callCount, 2);
@@ -122,16 +120,17 @@ test.serial('Handle API errors', async t => {
   ];
   const travis = api()
     .get(`/builds/${buildId}`)
+    .times(6)
     .reply(500, 'server error')
     .get(`/builds/${buildId}`)
     .reply(200, {jobs: jobsSecond});
 
   t.true(
-    await waitForOtherJobs(travisOpts, travisToken, buildId, currentJobId, jobsFirst, t.context.logger, {
-      forever: true,
-      factor: 1,
-      minTimeout: 1,
-    })
+    await waitForOtherJobs(
+      {travisOpts, travisToken, buildId, currentJobId, initialJobs: jobsFirst, logger: t.context.logger},
+      {forever: true, factor: 1, minTimeout: 1},
+      {minTimeout: 0}
+    )
   );
 
   t.is(t.context.log.args[0][0], 'Aborting attempt 1, because of pending job(s): 1.1, 1.3.');
