@@ -39,7 +39,7 @@
     "chalk": "^2.1.0",
     "execa": "^0.10.0",
     "got": "^8.0.1",
-    "p-retry": "^1.0.0",
+    "p-retry": "^2.0.0",
     "semver": "^5.4.1",
     "update-notifier": "^2.3.0",
     "url-join": "^4.0.0",
@@ -59,7 +59,7 @@
     "xo": "^0.20.0"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=6"
   },
   "files": [
     "bin",
