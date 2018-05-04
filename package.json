@@ -56,7 +56,7 @@
     "proxyquire": "^2.0.0",
     "semantic-release": "^15.0.0",
     "sinon": "^5.0.0",
-    "xo": "^0.20.0"
+    "xo": "^0.21.0"
   },
   "engines": {
     "node": ">=6"
@@ -90,7 +90,8 @@
     "all": true
   },
   "prettier": {
-    "printWidth": 120
+    "printWidth": 120,
+    "trailingComma": "es5"
   },
   "repository": {
     "type": "git",
