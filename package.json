@@ -5,8 +5,7 @@
   "author": "Stephan Bönnemann <stephan@boennemann.me>",
   "ava": {
     "require": [
-      "babel-register",
-      "babel-polyfill"
+      "./test/helpers/ava-babel-require"
     ]
   },
   "babel": {
@@ -19,6 +18,9 @@
           }
         }
       ]
+    ],
+    "plugins": [
+      "transform-object-rest-spread"
     ]
   },
   "bin": {
@@ -33,12 +35,13 @@
     }
   },
   "dependencies": {
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "chalk": "^2.1.0",
     "execa": "^0.10.0",
-    "got": "^8.0.1",
+    "got": "^9.0.0",
     "p-retry": "^2.0.0",
     "semver": "^5.4.1",
     "update-notifier": "^2.3.0",
