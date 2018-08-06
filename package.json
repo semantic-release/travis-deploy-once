@@ -59,7 +59,7 @@
     "proxyquire": "^2.0.0",
     "semantic-release": "^15.0.0",
     "sinon": "^6.0.0",
-    "xo": "^0.21.0"
+    "xo": "^0.22.0"
   },
   "engines": {
     "node": ">=6"
