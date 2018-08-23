@@ -129,7 +129,7 @@ test.serial('Handle API errors', async t => {
     await waitForOtherJobs(
       {travisOpts, travisToken, buildId, currentJobId, initialJobs: jobsFirst, logger: t.context.logger},
       {forever: true, factor: 1, minTimeout: 1},
-      {minTimeout: 0}
+      {forever: false, retries: 1, minTimeout: 0}
     )
   );
 
