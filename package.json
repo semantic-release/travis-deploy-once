@@ -5,22 +5,7 @@
   "author": "Stephan Bönnemann <stephan@boennemann.me>",
   "ava": {
     "require": [
-      "./test/helpers/ava-babel-require"
-    ]
-  },
-  "babel": {
-    "presets": [
-      [
-        "env",
-        {
-          "targets": {
-            "node": "current"
-          }
-        }
-      ]
-    ],
-    "plugins": [
-      "transform-object-rest-spread"
+      "./babel-register"
     ]
   },
   "bin": {
@@ -35,10 +20,10 @@
     }
   },
   "dependencies": {
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-register": "^6.26.0",
+    "@babel/core": "^7.0.0",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/register": "^7.0.0",
     "chalk": "^2.1.0",
     "execa": "^1.0.0",
     "got": "^9.1.0",
