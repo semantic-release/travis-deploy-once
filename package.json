@@ -52,6 +52,7 @@
   "files": [
     "bin",
     "lib",
+    "babel-register",
     "index.js",
     "cli.js"
   ],
