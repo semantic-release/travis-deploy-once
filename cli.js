@@ -57,9 +57,9 @@ module.exports = async () => {
     } else if (!script) {
       process.exitCode = 1;
     }
-  } catch (err) {
-    if (err.name !== 'YError') {
-      console.error(err);
+  } catch (error) {
+    if (error.name !== 'YError') {
+      console.error(error);
     }
     process.exitCode = 1;
   }
