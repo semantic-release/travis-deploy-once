@@ -1,6 +1,6 @@
 /* eslint-disable import/no-unassigned-import */
 require('@babel/register')({
   only: [/travis-deploy-once\/(lib|cli.js)/, /node_modules\/(got|cacheable-request)/],
-  presets: [['@babel/preset-env', {targets: {node: 'current'}, useBuiltIns: 'entry'}]],
+  presets: [[require.resolve('@babel/preset-env'), {targets: {node: 'current'}, useBuiltIns: 'entry'}]],
 });
 require('@babel/polyfill');
